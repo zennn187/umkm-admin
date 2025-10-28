@@ -18,7 +18,25 @@
             --light-color: #f8f9fa;
         }
 
-        body {
+        /* TAMBAH: Auth page styling */
+        body.auth-page {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        /* TAMBAH: Sembunyikan sidebar dan main content di auth pages */
+        body.auth-page .sidebar,
+        body.auth-page .main-content,
+        body.auth-page .whatsapp-float {
+            display: none !important;
+        }
+
+        /* DEFAULT: Styling untuk non-auth pages */
+        body:not(.auth-page) {
             background-color: #f8f9fe;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -261,8 +279,7 @@
     </style>
     @yield('styles')
 </head>
-<body>
-    <!-- Sidebar -->
+<body class="@if(Request::is('login') || Request::is('register') || Request::is('password/*'))auth-page @endif">    <!-- Sidebar -->
     <div class="sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
@@ -455,13 +472,23 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar Toggle for Mobile
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-
-        // Auto-hide alerts after 5 seconds
+        // TAMBAH: Auto-detect auth pages dan tambah class ke body
         document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const authPaths = ['/login', '/register', '/password/reset'];
+
+            // Check jika current path adalah auth page
+            if (authPaths.some(path => currentPath.includes(path))) {
+                document.body.classList.add('auth-page');
+                console.log('Auth page detected - hiding sidebar');
+            }
+
+            // Sidebar Toggle for Mobile
+            document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+
+            // Auto-hide alerts after 5 seconds
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
@@ -469,15 +496,13 @@
                     bsAlert.close();
                 });
             }, 5000);
-        });
 
-        // Active submenu handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
+            // Active submenu handling
+            const currentPath2 = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.sidebar-nav-link, .sidebar-nav-sublink');
 
             sidebarLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
+                if (link.getAttribute('href') === currentPath2) {
                     link.classList.add('active');
                     // Expand parent if it's a sublink
                     if (link.classList.contains('sidebar-nav-sublink')) {
@@ -488,10 +513,8 @@
                     }
                 }
             });
-        });
 
-        // WhatsApp button interaction
-        document.addEventListener('DOMContentLoaded', function() {
+            // WhatsApp button interaction
             const whatsappButton = document.querySelector('.whatsapp-float');
 
             if (whatsappButton) {

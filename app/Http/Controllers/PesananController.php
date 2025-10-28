@@ -44,12 +44,12 @@ class PesananController extends Controller
      * Display pesanan selesai
      */
     public function selesai()
-    {
-        // Ambil pesanan dengan status Selesai
-        $pesanans = Pesanan::where('status', 'Selesai')->get();
+{
+    // Ambil pesanan dengan status Selesai
+    $pesanans = Pesanan::where('status', 'Selesai')->get();
 
-        return view('pages.pesanan.selesai', compact('pesanans'));
-    }
+    return view('pages.pesanan.selesai', compact('pesanans'));
+}
 
     /**
      * Display the specified resource.

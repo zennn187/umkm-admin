@@ -89,3 +89,5 @@ Route::fallback(function () {
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+Route::get('/pesanan/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
