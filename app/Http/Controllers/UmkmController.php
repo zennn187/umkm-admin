@@ -15,7 +15,7 @@ class UmkmController extends Controller
         // Ambil data dari database
         $umkms = Umkm::all();
 
-        return view('umkm.index', compact('umkms'));
+        return view('pages.umkm.index', compact('umkms'));
     }
 
     /**
@@ -23,7 +23,7 @@ class UmkmController extends Controller
      */
     public function create()
     {
-        return view('umkm.create');
+        return view('pages.umkm.create');
     }
 
     /**
