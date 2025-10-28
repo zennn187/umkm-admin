@@ -344,29 +344,32 @@
                     </div>
 
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-none d-md-block">
-                            <small class="text-muted">Selamat datang,</small>
-                            <strong>{{ Auth::user()->name }}</strong>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="{{ route('pengaturan') }}"><i class="fas fa-cog me-2"></i>Pengaturan</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
-                                        @csrf
-                                        <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                        </a>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+    <div class="me-3 d-none d-md-block">
+        <small class="text-muted">Selamat datang,</small>
+        <strong>{{ Auth::check() ? Auth::user()->name : 'Guest' }}</strong>
+    </div>
+
+    <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            @auth
+            <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </form>
+            </li>
+            @else
+            <li><a class="dropdown-item" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a class="dropdown-item" href="{{ route('register') }}"><i class="fas fa-user-plus"></i> Register</a></li>
+            @endauth
+        </ul>
+    </div>
+</div>
                 </div>
             </div>
         </nav>

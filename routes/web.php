@@ -84,3 +84,8 @@ Route::middleware('auth')->group(function () {
 Route::fallback(function () {
     return redirect()->route('home');
 });
+
+// Route home yang bisa diakses semua orang
+Route::get('/', function () {
+    return view('home');
+})->name('home');
