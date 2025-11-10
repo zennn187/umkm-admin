@@ -15,7 +15,7 @@ class PesananController extends Controller
         // Ambil semua pesanan dari database
         $pesanans = Pesanan::all();
 
-        return view('pesanan.index', compact('pesanans'));
+        return view('pages.pesanan.index', compact('pesanans'));
     }
 
     /**
@@ -26,7 +26,7 @@ class PesananController extends Controller
         // Ambil pesanan dengan status Baru
         $pesanans = Pesanan::where('status', 'Baru')->get();
 
-        return view('pesanan.baru', compact('pesanans'));
+        return view('pages.pesanan.baru', compact('pesanans'));
     }
 
     /**
@@ -37,19 +37,19 @@ class PesananController extends Controller
         // Ambil pesanan dengan status Diproses
         $pesanans = Pesanan::where('status', 'Diproses')->get();
 
-        return view('pesanan.diproses', compact('pesanans'));
+        return view('pages.pesanan.diproses', compact('pesanans'));
     }
 
     /**
      * Display pesanan selesai
      */
     public function selesai()
-    {
-        // Ambil pesanan dengan status Selesai
-        $pesanans = Pesanan::where('status', 'Selesai')->get();
+{
+    // Ambil pesanan dengan status Selesai
+    $pesanans = Pesanan::where('status', 'Selesai')->get();
 
-        return view('pesanan.selesai', compact('pesanans'));
-    }
+    return view('pages.pesanan.selesai', compact('pesanans'));
+}
 
     /**
      * Display the specified resource.
@@ -59,7 +59,7 @@ class PesananController extends Controller
         // Ambil data pesanan dari database
         $pesanan = Pesanan::findOrFail($id);
 
-        return view('pesanan.show', compact('pesanan'));
+        return view('pages.pesanan.show', compact('pesanan'));
     }
 
     /**

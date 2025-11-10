@@ -30,6 +30,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+<<<<<<< HEAD
 {
     $request->validate([
         'name' => 'required|string|max:255',
@@ -53,6 +54,32 @@ class UserController extends Controller
     return redirect()->route('users.index')
         ->with('success', 'User berhasil ditambahkan!');
 }
+=======
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:admin,user',
+            'phone' => 'nullable|string|max:15',
+            'address' => 'nullable|string|max:500',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('users.index')
+            ->with('success', 'User berhasil ditambahkan!');
+    }
+
+>>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
     /**
      * Display the specified resource.
      */
@@ -79,7 +106,11 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,user',
             'phone' => 'nullable|string|max:15',
+<<<<<<< HEAD
             'alamat' => 'nullable|string|max:500', // Diubah dari 'address' menjadi 'alamat'
+=======
+            'address' => 'nullable|string|max:500',
+>>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
             'is_active' => 'boolean'
         ]);
 
@@ -88,7 +119,11 @@ class UserController extends Controller
             'email' => $request->email,
             'role' => $request->role,
             'phone' => $request->phone,
+<<<<<<< HEAD
             'alamat' => $request->alamat, // Diubah dari 'address' menjadi 'alamat'
+=======
+            'address' => $request->address,
+>>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
             'is_active' => $request->has('is_active'),
         ]);
 

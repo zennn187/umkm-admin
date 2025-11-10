@@ -73,7 +73,7 @@ class ProdukController extends Controller
         // Ambil data dari database dengan relasi UMKM
         $produk = Produk::with('umkm')->findOrFail($id);
 
-        return view('produk.show', compact('produk'));
+        return view('pages.produk.show', compact('produk'));
     }
 
     /**
@@ -114,7 +114,7 @@ class ProdukController extends Controller
                 'status' => $request->status
             ]);
 
-            return redirect()->route('produk.index')
+            return redirect()->route('pages.produk.index')
                             ->with('success', 'Produk berhasil diperbarui!');
 
         } catch (\Exception $e) {
