@@ -19,17 +19,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-<<<<<<< HEAD
         'phone',
         'alamat', // pastikan ini ada
         'role',
         'is_active',
-=======
-        'role',
-        'phone',
-        'address',
-        'is_active'
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
     ];
 
     /**
@@ -42,7 +35,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-<<<<<<< HEAD
     /**
      * The attributes that should be cast.
      *
@@ -52,11 +44,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_active' => 'boolean',
-    ];
-=======
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'is_active' => 'boolean'
     ];
 
     // Scope untuk filter role
@@ -69,5 +56,4 @@ class User extends Authenticatable
     {
         return $query->where('is_active', true);
     }
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
 }

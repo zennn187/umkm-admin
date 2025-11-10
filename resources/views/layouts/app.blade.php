@@ -332,15 +332,12 @@
                     <i class="fas fa-shopping-cart"></i> Data Pesanan
                 </a>
                 <ul class="sidebar-nav-subitem">
-<<<<<<< HEAD
-
                 </ul>
             </li>
 
 
 
-=======
-                    
+
                 </ul>
             </li>
 
@@ -372,7 +369,7 @@
                     <i class="fas fa-chart-pie"></i> Laporan UMKM
                 </a>
             </li>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
+
 
             <li class="sidebar-nav-section">PENGATURAN</li>
             <li class="sidebar-nav-item">
