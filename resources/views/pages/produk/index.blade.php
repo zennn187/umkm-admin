@@ -32,7 +32,7 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>No</th>
                         <th>Nama Produk</th>
                         <th>UMKM</th>
                         <th>Harga</th>

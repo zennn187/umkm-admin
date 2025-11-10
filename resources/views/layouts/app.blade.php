@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +19,25 @@
             --light-color: #f8f9fa;
         }
 
-        body {
+        /* TAMBAH: Auth page styling */
+        body.auth-page {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        /* TAMBAH: Sembunyikan sidebar dan main content di auth pages */
+        body.auth-page .sidebar,
+        body.auth-page .main-content,
+        body.auth-page .whatsapp-float {
+            display: none !important;
+        }
+
+        /* DEFAULT: Styling untuk non-auth pages */
+        body:not(.auth-page) {
             background-color: #f8f9fe;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -179,6 +198,54 @@
             align-items: center;
         }
 
+        /* WhatsApp Floating Button Styles */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 25px;
+            right: 25px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            background-color: #128C7E;
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .whatsapp-float i {
+            margin-top: 2px;
+        }
+
+        /* Pulse animation for WhatsApp button */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -193,12 +260,30 @@
             .sidebar.active {
                 margin-left: 0;
             }
+
+            .whatsapp-float {
+                width: 55px;
+                height: 55px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+                font-size: 22px;
+            }
         }
     </style>
     @yield('styles')
 </head>
-<body>
-    <!-- Sidebar -->
+
+<body class="@if (Request::is('login') || Request::is('register') || Request::is('password/*')) auth-page @endif"> <!-- Sidebar -->
     <div class="sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
@@ -212,118 +297,65 @@
         <ul class="sidebar-nav">
             <li class="sidebar-nav-section">DASHBOARD</li>
             <li class="sidebar-nav-item">
-                <a href="{{ route('dashboard') }}" class="sidebar-nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                <a href="{{ route('dashboard') }}"
+                    class="sidebar-nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i> Dashboard Utama
                 </a>
             </li>
 
             <li class="sidebar-nav-section">DATA MASTER</li>
             <li class="sidebar-nav-item">
-                <a href="{{ route('umkm.index') }}" class="sidebar-nav-link {{ request()->is('umkm*') ? 'active' : '' }}">
-    <i class="fas fa-building"></i> Data UMKM
-</a>
+                <a href="{{ route('umkm.index') }}"
+                    class="sidebar-nav-link {{ request()->is('umkm*') ? 'active' : '' }}">
+                    <i class="fas fa-building"></i> Data UMKM
+                </a>
                 <ul class="sidebar-nav-subitem">
-                    <li>
-                        <a href="{{ route('umkm.create') }}" class="sidebar-nav-sublink {{ request()->is('umkm/create') ? 'active' : '' }}">
-                            <i class="fas fa-plus-circle"></i> Tambah UMKM
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('umkm.index') }}" class="sidebar-nav-sublink {{ request()->is('umkm') && !request()->is('umkm/create') ? 'active' : '' }}">
-                            <i class="fas fa-list"></i> Daftar UMKM
-                        </a>
-                    </li>
+
+
                 </ul>
             </li>
 
             <li class="sidebar-nav-item">
-                <a href="{{ route('produk.index') }}" class="sidebar-nav-link {{ request()->is('produk*') ? 'active' : '' }}">
+                <a href="{{ route('produk.index') }}"
+                    class="sidebar-nav-link {{ request()->is('produk*') ? 'active' : '' }}">
                     <i class="fas fa-box"></i> Data Produk
                 </a>
                 <ul class="sidebar-nav-subitem">
-                    <li>
-                        <a href="{{ route('produk.create') }}" class="sidebar-nav-sublink {{ request()->is('produk/create') ? 'active' : '' }}">
-                            <i class="fas fa-plus-circle"></i> Tambah Produk
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('produk.index') }}" class="sidebar-nav-sublink {{ request()->is('produk') && !request()->is('produk/create') ? 'active' : '' }}">
-                            <i class="fas fa-list"></i> Daftar Produk
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('kategori.index') }}" class="sidebar-nav-sublink {{ request()->is('kategori*') ? 'active' : '' }}">
-                            <i class="fas fa-tags"></i> Kategori Produk
-                        </a>
-                    </li>
+
                 </ul>
             </li>
 
             <li class="sidebar-nav-section">TRANSAKSI</li>
             <li class="sidebar-nav-item">
-                <a href="{{ route('pesanan.index') }}" class="sidebar-nav-link {{ request()->is('pesanan*') ? 'active' : '' }}">
+                <a href="{{ route('pesanan.index') }}"
+                    class="sidebar-nav-link {{ request()->is('pesanan*') ? 'active' : '' }}">
                     <i class="fas fa-shopping-cart"></i> Data Pesanan
                 </a>
                 <ul class="sidebar-nav-subitem">
-                    <li>
-                        <a href="{{ route('pesanan.index') }}" class="sidebar-nav-sublink {{ request()->is('pesanan') ? 'active' : '' }}">
-                            <i class="fas fa-list"></i> Semua Pesanan
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('pesanan.baru') }}" class="sidebar-nav-sublink {{ request()->is('pesanan/baru') ? 'active' : '' }}">
-                            <i class="fas fa-clock"></i> Pesanan Baru
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('pesanan.diproses') }}" class="sidebar-nav-sublink {{ request()->is('pesanan/diproses') ? 'active' : '' }}">
-                            <i class="fas fa-cog"></i> Sedang Diproses
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('pesanan.selesai') }}" class="sidebar-nav-sublink {{ request()->is('pesanan/selesai') ? 'active' : '' }}">
-                            <i class="fas fa-check-circle"></i> Selesai
-                        </a>
-                    </li>
+
                 </ul>
             </li>
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('pembayaran.index') }}" class="sidebar-nav-link {{ request()->is('pembayaran*') ? 'active' : '' }}">
-                    <i class="fas fa-credit-card"></i> Pembayaran
-                </a>
-            </li>
 
-            <li class="sidebar-nav-section">LAPORAN</li>
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.penjualan') }}" class="sidebar-nav-link {{ request()->is('laporan/penjualan') ? 'active' : '' }}">
-                    <i class="fas fa-chart-line"></i> Laporan Penjualan
-                </a>
-            </li>
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.produk') }}" class="sidebar-nav-link {{ request()->is('laporan/produk') ? 'active' : '' }}">
-                    <i class="fas fa-chart-bar"></i> Laporan Produk
-                </a>
-            </li>
-
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.umkm') }}" class="sidebar-nav-link {{ request()->is('laporan/umkm') ? 'active' : '' }}">
-                    <i class="fas fa-chart-pie"></i> Laporan UMKM
-                </a>
-            </li>
 
             <li class="sidebar-nav-section">PENGATURAN</li>
             <li class="sidebar-nav-item">
-                <a href="{{ route('profile') }}" class="sidebar-nav-link {{ request()->is('profile') ? 'active' : '' }}">
+                <a href="{{ route('profile') }}"
+                    class="sidebar-nav-link {{ request()->is('profile') ? 'active' : '' }}">
                     <i class="fas fa-user-cog"></i> Profile
                 </a>
             </li>
 
+
+
+            <li class="sidebar-nav-section">MANAJEMEN USER</li>
             <li class="sidebar-nav-item">
-                <a href="{{ route('pengaturan') }}" class="sidebar-nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
-                    <i class="fas fa-cogs"></i> Pengaturan Sistem
+                <a href="{{ route('users.index') }}"
+                    class="sidebar-nav-link {{ request()->is('users*') ? 'active' : '' }}">
+                    <i class="fas fa-users-cog"></i> Manajemen User
                 </a>
+
             </li>
         </ul>
     </div>
@@ -346,24 +378,34 @@
                     <div class="d-flex align-items-center">
                         <div class="me-3 d-none d-md-block">
                             <small class="text-muted">Selamat datang,</small>
-                            <strong>{{ Auth::user()->name }}</strong>
+                            <strong>{{ Auth::check() ? Auth::user()->name : 'Guest' }}</strong>
                         </div>
+
                         <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="{{ route('pengaturan') }}"><i class="fas fa-cog me-2"></i>Pengaturan</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
-                                        @csrf
-                                        <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                        </a>
-                                    </form>
-                                </li>
+                                @auth
+                                    <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user"></i>
+                                            Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                                                Logout</button>
+                                        </form>
+                                    </li>
+                                @else
+                                    <li><a class="dropdown-item" href="{{ route('login') }}"><i
+                                                class="fas fa-sign-in-alt"></i> Login</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('register') }}"><i
+                                                class="fas fa-user-plus"></i> Register</a></li>
+                                @endauth
                             </ul>
                         </div>
                     </div>
@@ -377,16 +419,32 @@
         </div>
     </div>
 
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6289505647628?text=Halo,%20saya%20membutuhkan%20informasi%20tentang%20UMKM%20Anda"
+        class="whatsapp-float" target="_blank" title="Hubungi Kami via WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar Toggle for Mobile
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-
-        // Auto-hide alerts after 5 seconds
+        // TAMBAH: Auto-detect auth pages dan tambah class ke body
         document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const authPaths = ['/login', '/register', '/password/reset'];
+
+            // Check jika current path adalah auth page
+            if (authPaths.some(path => currentPath.includes(path))) {
+                document.body.classList.add('auth-page');
+                console.log('Auth page detected - hiding sidebar');
+            }
+
+            // Sidebar Toggle for Mobile
+            document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+
+            // Auto-hide alerts after 5 seconds
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
@@ -394,27 +452,40 @@
                     bsAlert.close();
                 });
             }, 5000);
-        });
 
-        // Active submenu handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
+            // Active submenu handling
+            const currentPath2 = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.sidebar-nav-link, .sidebar-nav-sublink');
 
             sidebarLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
+                if (link.getAttribute('href') === currentPath2) {
                     link.classList.add('active');
                     // Expand parent if it's a sublink
                     if (link.classList.contains('sidebar-nav-sublink')) {
-                        const parentLink = link.closest('.sidebar-nav-item').querySelector('.sidebar-nav-link');
+                        const parentLink = link.closest('.sidebar-nav-item').querySelector(
+                            '.sidebar-nav-link');
                         if (parentLink) {
                             parentLink.classList.add('active');
                         }
                     }
                 }
             });
+
+            // WhatsApp button interaction
+            const whatsappButton = document.querySelector('.whatsapp-float');
+
+            if (whatsappButton) {
+                // Add click animation
+                whatsappButton.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1.1)';
+                    }, 150);
+                });
+            }
         });
     </script>
     @yield('scripts')
 </body>
+
 </html>

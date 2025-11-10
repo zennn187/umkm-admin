@@ -89,9 +89,9 @@
         <div class="dashboard-card card-gradient-1 stat-card">
             <div class="card-body">
                 <div class="stat-title">TOTAL UMKM</div>
-                <div class="stat-number">48</div>
+                <div class="stat-number">2</div>
                 <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +12% dari bulan lalu
+                    <i class="fas fa-arrow-up me-1"></i> +100% dari bulan lalu
                 </div>
             </div>
         </div>
@@ -101,9 +101,9 @@
         <div class="dashboard-card card-gradient-2 stat-card">
             <div class="card-body">
                 <div class="stat-title">PRODUK TERDAFTAR</div>
-                <div class="stat-number">156</div>
+                <div class="stat-number">3</div>
                 <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +8% dari bulan lalu
+                    <i class="fas fa-arrow-up me-1"></i> +85% dari bulan lalu
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
         <div class="dashboard-card card-gradient-3 stat-card">
             <div class="card-body">
                 <div class="stat-title">PESANAN BARU</div>
-                <div class="stat-number">23</div>
+                <div class="stat-number">6</div>
                 <div class="stat-change positive">
                     <i class="fas fa-bell me-1"></i> Perlu diproses
                 </div>
@@ -125,9 +125,9 @@
         <div class="dashboard-card card-gradient-4 stat-card">
             <div class="card-body">
                 <div class="stat-title">PENDAPATAN BULAN INI</div>
-                <div class="stat-number">Rp 12.5Jt</div>
+                <div class="stat-number">Rp 120Rb</div>
                 <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +15% dari bulan lalu
+                    <i class="fas fa-arrow-up me-1"></i> +60% dari bulan lalu
                 </div>
             </div>
         </div>
@@ -223,8 +223,8 @@
                         <i class="fas fa-store"></i>
                     </div>
                     <div class="flex-grow-1">
-                        <div class="fw-bold">UMKM "Toko Roti Segar" terdaftar</div>
-                        <small class="text-muted">1 jam yang lalu</small>
+                        <div class="fw-bold">UMKM "Rafif Lele Marinasi" terdaftar</div>
+                        <small class="text-muted">4 jam yang lalu</small>
                     </div>
                     <span class="badge bg-success">Baru</span>
                 </div>
@@ -233,7 +233,7 @@
                         <i class="fas fa-box"></i>
                     </div>
                     <div class="flex-grow-1">
-                        <div class="fw-bold">Produk "Kue Lapis" ditambahkan</div>
+                        <div class="fw-bold">Produk "Lele Marinasi" ditambahkan</div>
                         <small class="text-muted">2 jam yang lalu</small>
                     </div>
                     <span class="badge bg-info">Baru</span>

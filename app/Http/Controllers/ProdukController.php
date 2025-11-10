@@ -16,7 +16,7 @@ class ProdukController extends Controller
         // Ambil data dari database dengan relasi UMKM
         $produks = Produk::with('umkm')->get();
 
-        return view('produk.index', compact('produks'));
+        return view('pages.produk.index', compact('produks'));
     }
 
     /**
@@ -27,7 +27,7 @@ class ProdukController extends Controller
         // Ambil data UMKM untuk dropdown
         $umkms = Umkm::where('status', 'Aktif')->get();
 
-        return view('produk.create', compact('umkms'));
+        return view('pages.produk.create', compact('umkms'));
     }
 
     /**
@@ -85,7 +85,7 @@ class ProdukController extends Controller
         $produk = Produk::findOrFail($id);
         $umkms = Umkm::where('status', 'Aktif')->get();
 
-        return view('produk.edit', compact('produk', 'umkms'));
+        return view('pages.produk.edit', compact('produk', 'umkms'));
     }
 
     /**
@@ -155,6 +155,6 @@ class ProdukController extends Controller
             ['id' => 4, 'nama' => 'Kesehatan & Kecantikan', 'jumlah_produk' => 12]
         ];
 
-        return view('produk.kategori', compact('kategories'));
+        return view('pages.produk.kategori', compact('kategories'));
     }
 }

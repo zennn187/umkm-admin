@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UmkmController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\PesananController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\PengaturanController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UmkmController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PengaturanController;
 
 // Route Public
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -84,3 +85,14 @@ Route::middleware('auth')->group(function () {
 Route::fallback(function () {
     return redirect()->route('home');
 });
+
+// Route home yang bisa diakses semua orang
+Route::get('/', function () {
+    return view('home');
+})->name('home');
+
+Route::get('/pesanan/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
+
+Route::resource('users', UserController::class);
+Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.password');
+Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
