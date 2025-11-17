@@ -71,6 +71,18 @@
             background-color: rgba(17, 205, 239, 0.1);
             color: var(--info-color);
         }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-change.positive {
+            color: rgba(255, 255, 255, 0.9);
+        }
     </style>
 @endsection
 
@@ -83,26 +95,15 @@
         </div>
     @endif
 
-<<<<<<< HEAD
-<!-- Stats Cards -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="dashboard-card card-gradient-1 stat-card">
-            <div class="card-body">
-                <div class="stat-title">TOTAL UMKM</div>
-                <div class="stat-number">2</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +100% dari bulan lalu
-=======
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="dashboard-card card-gradient-1 stat-card">
                 <div class="card-body">
                     <div class="stat-title">TOTAL UMKM</div>
-                    <div class="stat-number">48</div>
+                    <div class="stat-number">2</div>
                     <div class="stat-change positive">
-                        <i class="fas fa-arrow-up me-1"></i> +12% dari bulan lalu
+                        <i class="fas fa-arrow-up me-1"></i> +100% dari bulan lalu
                     </div>
                 </div>
             </div>
@@ -112,7 +113,7 @@
             <div class="dashboard-card card-gradient-2 stat-card">
                 <div class="card-body">
                     <div class="stat-title">PRODUK TERDAFTAR</div>
-                    <div class="stat-number">156</div>
+                    <div class="stat-number">8</div>
                     <div class="stat-change positive">
                         <i class="fas fa-arrow-up me-1"></i> +8% dari bulan lalu
                     </div>
@@ -136,37 +137,15 @@
             <div class="dashboard-card card-gradient-4 stat-card">
                 <div class="card-body">
                     <div class="stat-title">PENDAPATAN BULAN INI</div>
-                    <div class="stat-number">Rp 12.5Jt</div>
+                    <div class="stat-number">Rp 120Rb</div>
                     <div class="stat-change positive">
-                        <i class="fas fa-arrow-up me-1"></i> +15% dari bulan lalu
+                        <i class="fas fa-arrow-up me-1"></i> +60% dari bulan lalu
                     </div>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
                 </div>
             </div>
         </div>
     </div>
 
-<<<<<<< HEAD
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="dashboard-card card-gradient-2 stat-card">
-            <div class="card-body">
-                <div class="stat-title">PRODUK TERDAFTAR</div>
-                <div class="stat-number">3</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +85% dari bulan lalu
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="dashboard-card card-gradient-3 stat-card">
-            <div class="card-body">
-                <div class="stat-title">PESANAN BARU</div>
-                <div class="stat-number">6</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-bell me-1"></i> Perlu diproses
-=======
     <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-12">
@@ -179,130 +158,9 @@
                         <i class="fas fa-plus-circle"></i>
                     </div>
                     <h6>Tambah UMKM</h6>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
                 </div>
             </a>
         </div>
-<<<<<<< HEAD
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="dashboard-card card-gradient-4 stat-card">
-            <div class="card-body">
-                <div class="stat-title">PENDAPATAN BULAN INI</div>
-                <div class="stat-number">Rp 120Rb</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i> +60% dari bulan lalu
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="row mb-4">
-    <div class="col-12">
-        <h5 class="mb-3">Aksi Cepat</h5>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('umkm.create') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-plus-circle"></i>
-                </div>
-                <h6>Tambah UMKM</h6>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('produk.create') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <h6>Tambah Produk</h6>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('pesanan.baru') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <h6>Pesanan Baru</h6>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('laporan.penjualan') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h6>Laporan</h6>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('kategori.index') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <h6>Kategori</h6>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6 mb-3">
-        <a href="{{ route('pengaturan') }}" class="text-decoration-none">
-            <div class="quick-action-card">
-                <div class="icon">
-                    <i class="fas fa-cogs"></i>
-                </div>
-                <h6>Pengaturan</h6>
-            </div>
-        </a>
-    </div>
-</div>
-
-<!-- Recent Activity & Charts -->
-<div class="row">
-    <!-- Recent Activity -->
-    <div class="col-xl-6 mb-4">
-        <div class="recent-activity">
-            <h5 class="mb-4">Aktivitas Terbaru</h5>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <div class="activity-icon success">
-                        <i class="fas fa-cart-plus"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">Pesanan Baru #ORD-0012</div>
-                        <small class="text-muted">5 menit yang lalu</small>
-                    </div>
-                    <span class="badge bg-warning">Baru</span>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon warning">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">UMKM "Rafif Lele Marinasi" terdaftar</div>
-                        <small class="text-muted">4 jam yang lalu</small>
-                    </div>
-                    <span class="badge bg-success">Baru</span>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon info">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">Produk "Lele Marinasi" ditambahkan</div>
-                        <small class="text-muted">2 jam yang lalu</small>
-                    </div>
-                    <span class="badge bg-info">Baru</span>
-=======
         <div class="col-xl-2 col-md-4 col-6 mb-3">
             <a href="{{ route('produk.create') }}" class="text-decoration-none">
                 <div class="quick-action-card">
@@ -310,12 +168,11 @@
                         <i class="fas fa-box"></i>
                     </div>
                     <h6>Tambah Produk</h6>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
                 </div>
             </a>
         </div>
         <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <a href="{{ route('pesanan.baru') }}" class="text-decoration-none">
+            <a href="{{ route('pesanan.index') }}" class="text-decoration-none">
                 <div class="quick-action-card">
                     <div class="icon">
                         <i class="fas fa-shopping-cart"></i>
@@ -356,69 +213,9 @@
         </div>
     </div>
 
-    <!-- Recent Activity & Charts -->
+    <!-- Performance Chart -->
     <div class="row">
-        <!-- Recent Activity -->
-        <div class="col-xl-6 mb-4">
-            <div class="recent-activity">
-                <h5 class="mb-4">Aktivitas Terbaru</h5>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-cart-plus"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">Pesanan Baru #ORD-0012</div>
-                            <small class="text-muted">5 menit yang lalu</small>
-                        </div>
-                        <span class="badge bg-warning">Baru</span>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon warning">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">UMKM "Toko Roti Segar" terdaftar</div>
-                            <small class="text-muted">1 jam yang lalu</small>
-                        </div>
-                        <span class="badge bg-success">Baru</span>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon info">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">Produk "Kue Lapis" ditambahkan</div>
-                            <small class="text-muted">2 jam yang lalu</small>
-                        </div>
-                        <span class="badge bg-info">Baru</span>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">Pesanan #ORD-0011 selesai</div>
-                            <small class="text-muted">3 jam yang lalu</small>
-                        </div>
-                        <span class="badge bg-success">Selesai</span>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon warning">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">Pesanan #ORD-0010 dikirim</div>
-                            <small class="text-muted">5 jam yang lalu</small>
-                        </div>
-                        <span class="badge bg-primary">Dikirim</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Performance Chart -->
-        <div class="col-xl-6 mb-4">
+        <div class="col-12">
             <div class="chart-container">
                 <h5 class="mb-4">Performa Penjualan</h5>
                 <div class="chart-placeholder">

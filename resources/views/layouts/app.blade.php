@@ -283,14 +283,15 @@
     @yield('styles')
 </head>
 
-<body class="@if (Request::is('login') || Request::is('register') || Request::is('password/*')) auth-page @endif"> <!-- Sidebar -->
+<body class="@yield('body-class')">
+    <!-- Sidebar -->
     <div class="sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
             <h4 class="mb-0">
                 <i class="fas fa-store"></i> SISTEM UMKM
             </h4>
-            <small class="opacity-75">Management Usaha Mikro</small>
+            <small class="opacity-75">Manajemen Usaha Mikro</small>
         </div>
 
         <!-- Navigation -->
@@ -299,7 +300,7 @@
             <li class="sidebar-nav-item">
                 <a href="{{ route('dashboard') }}"
                     class="sidebar-nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard Utama
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
 
@@ -309,10 +310,6 @@
                     class="sidebar-nav-link {{ request()->is('umkm*') ? 'active' : '' }}">
                     <i class="fas fa-building"></i> Data UMKM
                 </a>
-                <ul class="sidebar-nav-subitem">
-
-
-                </ul>
             </li>
 
             <li class="sidebar-nav-item">
@@ -320,35 +317,15 @@
                     class="sidebar-nav-link {{ request()->is('produk*') ? 'active' : '' }}">
                     <i class="fas fa-box"></i> Data Produk
                 </a>
-                <ul class="sidebar-nav-subitem">
-
-                </ul>
             </li>
 
-            <li class="sidebar-nav-section">TRANSAKSI</li>
             <li class="sidebar-nav-item">
                 <a href="{{ route('pesanan.index') }}"
                     class="sidebar-nav-link {{ request()->is('pesanan*') ? 'active' : '' }}">
                     <i class="fas fa-shopping-cart"></i> Data Pesanan
                 </a>
-                <ul class="sidebar-nav-subitem">
-                </ul>
             </li>
 
-
-
-
-                </ul>
-            </li>
-
-            <li class="sidebar-nav-item">
-                <a href="{{ route('pembayaran.index') }}"
-                    class="sidebar-nav-link {{ request()->is('pembayaran*') ? 'active' : '' }}">
-                    <i class="fas fa-credit-card"></i> Pembayaran
-                </a>
-            </li>
-
-            <li class="sidebar-nav-section">LAPORAN</li>
             <li class="sidebar-nav-item">
                 <a href="{{ route('laporan.penjualan') }}"
                     class="sidebar-nav-link {{ request()->is('laporan/penjualan') ? 'active' : '' }}">
@@ -356,66 +333,12 @@
                 </a>
             </li>
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.produk') }}"
-                    class="sidebar-nav-link {{ request()->is('laporan/produk') ? 'active' : '' }}">
-                    <i class="fas fa-chart-bar"></i> Laporan Produk
-                </a>
-            </li>
-
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.umkm') }}"
-                    class="sidebar-nav-link {{ request()->is('laporan/umkm') ? 'active' : '' }}">
-                    <i class="fas fa-chart-pie"></i> Laporan UMKM
-                </a>
-            </li>
-
-
-            <li class="sidebar-nav-section">PENGATURAN</li>
-            <li class="sidebar-nav-item">
-                <a href="{{ route('profile') }}"
-                    class="sidebar-nav-link {{ request()->is('profile') ? 'active' : '' }}">
-                    <i class="fas fa-user-cog"></i> Profile
-                </a>
-            </li>
-
-
-
-            <li class="sidebar-nav-section">MANAJEMEN USER</li>
-            <li class="sidebar-nav-item">
-<<<<<<< HEAD
-                <a href="{{ route('users.index') }}"
-                    class="sidebar-nav-link {{ request()->is('users*') ? 'active' : '' }}">
-                    <i class="fas fa-users-cog"></i> Manajemen User
-=======
-                <a href="{{ route('pengaturan') }}"
-                    class="sidebar-nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
-                    <i class="fas fa-cogs"></i> Pengaturan Sistem
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
-                </a>
-
-            </li>
-
             <li class="sidebar-nav-section">MANAJEMEN USER</li>
             <li class="sidebar-nav-item">
                 <a href="{{ route('users.index') }}"
                     class="sidebar-nav-link {{ request()->is('users*') ? 'active' : '' }}">
                     <i class="fas fa-users-cog"></i> Manajemen User
                 </a>
-                <ul class="sidebar-nav-subitem">
-                    <li>
-                        <a href="{{ route('users.index') }}"
-                            class="sidebar-nav-sublink {{ request()->is('users') ? 'active' : '' }}">
-                            <i class="fas fa-list"></i> Daftar User
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('users.create') }}"
-                            class="sidebar-nav-sublink {{ request()->is('users/create') ? 'active' : '' }}">
-                            <i class="fas fa-plus-circle"></i> Tambah User
-                        </a>
-                    </li>
-                </ul>
             </li>
         </ul>
     </div>
@@ -448,26 +371,16 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 @auth
-<<<<<<< HEAD
                                     <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user"></i>
                                             Profile</a></li>
-=======
-                                    <li><a class="dropdown-item" href="{{ route('profile') }}"><i
-                                                class="fas fa-user"></i> Profile</a></li>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
-<<<<<<< HEAD
                                             <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
                                                 Logout</button>
-=======
-                                            <button type="submit" class="dropdown-item"><i
-                                                    class="fas fa-sign-out-alt"></i> Logout</button>
->>>>>>> b9380990f8be3081506fb6b71bface57d5f166e1
                                         </form>
                                     </li>
                                 @else
