@@ -10,10 +10,41 @@ class PesananController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Query dasar
+        $pesanans = Pesanan::query();
+
+        // Fitur Search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhere('customer', 'like', "%{$search}%")
+                      ->orWhere('alamat_kirim', 'like', "%{$search}%");
+            });
+        }
+
+        // Fitur Filter Status
+        if ($request->has('status') && $request->status != '') {
+            $pesanans->where('status', $request->status);
+        }
+
+        // Fitur Filter RT
+        if ($request->has('rt') && $request->rt != '') {
+            $pesanans->where('rt', $request->rt);
+        }
+
+        // Fitur Filter RW
+        if ($request->has('rw') && $request->rw != '') {
+            $pesanans->where('rw', $request->rw);
+        }
+
         // Ambil pesanan terbaru dengan pagination
-        $pesanans = Pesanan::orderBy('created_at', 'desc')->paginate(10);
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(10);
+
+        // Tambahkan parameter request ke pagination
+        $pesanans->appends($request->all());
 
         return view('pages.pesanan.index', compact('pesanans'));
     }
@@ -21,32 +52,60 @@ class PesananController extends Controller
     /**
      * Display pesanan baru
      */
-   public function baru()
-{
-    $pesanans = Pesanan::where('status', 'Baru')
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(5);
+    public function baru(Request $request)
+    {
+        $pesanans = Pesanan::where('status', 'Baru');
 
-    return view('pages.pesanan.baru', compact('pesanans'));
-}
+        // Tambahkan search untuk halaman baru
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhere('customer', 'like', "%{$search}%");
+            });
+        }
 
-public function diproses()
-{
-    $pesanans = Pesanan::where('status', 'Diproses')
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(5);
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
 
-    return view('pages.pesanan.diproses', compact('pesanans'));
-}
+        return view('pages.pesanan.baru', compact('pesanans'));
+    }
 
-public function selesai()
-{
-    $pesanans = Pesanan::where('status', 'Selesai')
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(5);
+    public function diproses(Request $request)
+    {
+        $pesanans = Pesanan::where('status', 'Diproses');
 
-    return view('pages.pesanan.selesai', compact('pesanans'));
-}
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhere('customer', 'like', "%{$search}%");
+            });
+        }
+
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
+
+        return view('pages.pesanan.diproses', compact('pesanans'));
+    }
+
+    public function selesai(Request $request)
+    {
+        $pesanans = Pesanan::where('status', 'Selesai');
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhere('customer', 'like', "%{$search}%");
+            });
+        }
+
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
+
+        return view('pages.pesanan.selesai', compact('pesanans'));
+    }
 
     /**
      * Display the specified resource.

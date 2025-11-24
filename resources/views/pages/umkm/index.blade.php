@@ -25,8 +25,92 @@
     </div>
 @endif
 
+{{-- FILTER DAN SEARCH --}}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form action="{{ route('umkm.index') }}" method="GET">
+            <div class="row g-3">
+                {{-- Search Input --}}
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Pencarian</label>
+                    <input type="text" class="form-control" id="search" name="search"
+                           placeholder="Cari nama usaha, pemilik, alamat..."
+                           value="{{ request('search') }}">
+                </div>
+
+                {{-- Filter Status --}}
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">Semua Status</option>
+                        <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="Nonaktif" {{ request('status') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                    </select>
+                </div>
+
+                {{-- Filter Kategori --}}
+                <div class="col-md-2">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <select class="form-select" id="kategori" name="kategori">
+                        <option value="">Semua Kategori</option>
+                        @foreach($kategories as $kategori)
+                            <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
+                                {{ $kategori }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filter RT --}}
+                <div class="col-md-1">
+                    <label for="rt" class="form-label">RT</label>
+                    <input type="text" class="form-control" id="rt" name="rt"
+                           placeholder="RT" value="{{ request('rt') }}" maxlength="3">
+                </div>
+
+                {{-- Filter RW --}}
+                <div class="col-md-1">
+                    <label for="rw" class="form-label">RW</label>
+                    <input type="text" class="form-control" id="rw" name="rw"
+                           placeholder="RW" value="{{ request('rw') }}" maxlength="3">
+                </div>
+
+                {{-- Tombol Aksi --}}
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="d-grid gap-2 w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Terapkan
+                        </button>
+                        <a href="{{ route('umkm.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-refresh"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
+        {{-- Info Filter Aktif --}}
+        @if(request()->hasAny(['search', 'status', 'kategori', 'rt', 'rw']))
+        <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <i class="fas fa-info-circle"></i>
+                Menampilkan hasil filter:
+                @if(request('search')) <span class="badge bg-primary">Pencarian: "{{ request('search') }}"</span> @endif
+                @if(request('status')) <span class="badge bg-{{ request('status') == 'Aktif' ? 'success' : 'danger' }}">Status: {{ request('status') }}</span> @endif
+                @if(request('kategori')) <span class="badge bg-warning">Kategori: {{ request('kategori') }}</span> @endif
+                @if(request('rt')) <span class="badge bg-info">RT: {{ request('rt') }}</span> @endif
+                @if(request('rw')) <span class="badge bg-info">RW: {{ request('rw') }}</span> @endif
+            </div>
+            <a href="{{ route('umkm.index') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-times"></i> Hapus Filter
+            </a>
+        </div>
+        @endif
+
         @if($umkms->count() > 0)
         <div class="table-responsive">
             <table class="table table-hover">
@@ -46,10 +130,20 @@
                     @foreach($umkms as $umkm)
                     <tr>
                         <td>{{ $loop->iteration + ($umkms->currentPage()-1) * $umkms->perPage() }}</td>
-                        <td>{{ $umkm->nama_usaha }}</td>
+                        <td>
+                            <strong>{{ $umkm->nama_usaha }}</strong>
+                            @if($umkm->status == 'Nonaktif')
+                                <br><small class="text-muted">(Nonaktif)</small>
+                            @endif
+                        </td>
                         <td>{{ $umkm->pemilik }}</td>
-                        <td>{{ $umkm->alamat }}, RT {{ $umkm->rt }}/RW {{ $umkm->rw }}</td>
-                        <td>{{ $umkm->kategori }}</td>
+                        <td>
+                            {{ Str::limit($umkm->alamat, 30) }},
+                            <br><small class="text-muted">RT {{ $umkm->rt }}/RW {{ $umkm->rw }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ $umkm->kategori }}</span>
+                        </td>
                         <td>{{ $umkm->kontak }}</td>
                         <td>
                             <span class="badge bg-{{ $umkm->status == 'Aktif' ? 'success' : 'danger' }}">
@@ -58,16 +152,16 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <a href="{{ route('umkm.show', $umkm->umkm_id) }}" class="btn btn-sm btn-info">
+                                <a href="{{ route('umkm.show', $umkm->umkm_id) }}" class="btn btn-sm btn-info" title="Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('umkm.edit', $umkm->umkm_id) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('umkm.edit', $umkm->umkm_id) }}" class="btn btn-sm btn-warning" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('umkm.destroy', $umkm->umkm_id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus UMKM ini?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus UMKM ini?')" title="Hapus">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -86,11 +180,19 @@
         @else
         <div class="text-center py-5">
             <i class="fas fa-building fa-3x text-muted mb-3"></i>
-            <h5>Belum ada data UMKM</h5>
-            <p class="text-muted">Silakan tambah data UMKM pertama Anda.</p>
-            <a href="{{ route('umkm.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus-circle me-2"></i>Tambah UMKM Pertama
-            </a>
+            @if(request()->hasAny(['search', 'status', 'kategori', 'rt', 'rw']))
+                <h5>Tidak ada UMKM yang sesuai dengan filter</h5>
+                <p class="text-muted">Coba ubah kriteria pencarian atau filter Anda.</p>
+                <a href="{{ route('umkm.index') }}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-2"></i>Tampilkan Semua UMKM
+                </a>
+            @else
+                <h5>Belum ada data UMKM</h5>
+                <p class="text-muted">Silakan tambah data UMKM pertama Anda.</p>
+                <a href="{{ route('umkm.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Tambah UMKM Pertama
+                </a>
+            @endif
         </div>
         @endif
     </div>

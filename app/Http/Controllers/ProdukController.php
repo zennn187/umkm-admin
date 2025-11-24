@@ -11,12 +11,52 @@ class ProdukController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil data dari database dengan relasi UMKM + pagination
-        $produks = Produk::with('umkm')->paginate(10); // ⬅ PAGINATION
+        // Query dasar dengan relasi UMKM
+        $produks = Produk::with('umkm');
 
-        return view('pages.produk.index', compact('produks'));
+        // Fitur Search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $produks->where(function($query) use ($search) {
+                $query->where('nama_produk', 'like', "%{$search}%")
+                      ->orWhere('deskripsi', 'like', "%{$search}%")
+                      ->orWhereHas('umkm', function($q) use ($search) {
+                          $q->where('nama_usaha', 'like', "%{$search}%");
+                      });
+            });
+        }
+
+        // Fitur Filter Status
+        if ($request->has('status') && $request->status != '') {
+            $produks->where('status', $request->status);
+        }
+
+        // Fitur Filter UMKM
+        if ($request->has('umkm_id') && $request->umkm_id != '') {
+            $produks->where('umkm_id', $request->umkm_id);
+        }
+
+        // Fitur Filter Stok
+        if ($request->has('stok_filter') && $request->stok_filter != '') {
+            if ($request->stok_filter == 'tersedia') {
+                $produks->where('stok', '>', 0);
+            } elseif ($request->stok_filter == 'habis') {
+                $produks->where('stok', '=', 0);
+            }
+        }
+
+        // Ambil data dengan pagination
+        $produks = $produks->orderBy('created_at', 'desc')->paginate(10);
+
+        // Tambahkan parameter request ke pagination
+        $produks->appends($request->all());
+
+        // Ambil data UMKM untuk dropdown filter
+        $umkms = Umkm::where('status', 'Aktif')->get();
+
+        return view('pages.produk.index', compact('produks', 'umkms'));
     }
 
     /**
@@ -110,7 +150,6 @@ class ProdukController extends Controller
                 'status' => $request->status
             ]);
 
-            // BUG FIX: route sebelumnya salah
             return redirect()->route('produk.index')
                             ->with('success', 'Produk berhasil diperbarui!');
 

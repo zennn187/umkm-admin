@@ -10,14 +10,54 @@ class UmkmController extends Controller
     /**
      * Display a listing of the resource.
      */
-   public function index()
-{
-    // Ambil data menggunakan pagination
-    $umkms = Umkm::paginate(10); // 10 data per halaman
+    public function index(Request $request)
+    {
+        // Query dasar
+        $umkms = Umkm::query();
 
-    return view('pages.umkm.index', compact('umkms'));
-}
+        // Fitur Search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $umkms->where(function($query) use ($search) {
+                $query->where('nama_usaha', 'like', "%{$search}%")
+                      ->orWhere('pemilik', 'like', "%{$search}%")
+                      ->orWhere('alamat', 'like', "%{$search}%")
+                      ->orWhere('kategori', 'like', "%{$search}%")
+                      ->orWhere('kontak', 'like', "%{$search}%");
+            });
+        }
 
+        // Fitur Filter Status
+        if ($request->has('status') && $request->status != '') {
+            $umkms->where('status', $request->status);
+        }
+
+        // Fitur Filter Kategori
+        if ($request->has('kategori') && $request->kategori != '') {
+            $umkms->where('kategori', $request->kategori);
+        }
+
+        // Fitur Filter RT
+        if ($request->has('rt') && $request->rt != '') {
+            $umkms->where('rt', $request->rt);
+        }
+
+        // Fitur Filter RW
+        if ($request->has('rw') && $request->rw != '') {
+            $umkms->where('rw', $request->rw);
+        }
+
+        // Ambil data dengan pagination
+        $umkms = $umkms->orderBy('created_at', 'desc')->paginate(10);
+
+        // Tambahkan parameter request ke pagination
+        $umkms->appends($request->all());
+
+        // Ambil daftar kategori unik untuk dropdown
+        $kategories = Umkm::select('kategori')->distinct()->pluck('kategori');
+
+        return view('pages.umkm.index', compact('umkms', 'kategories'));
+    }
 
     /**
      * Show the form for creating a new resource.
