@@ -44,7 +44,7 @@
                 <tbody>
                     @foreach($produks as $produk)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $loop->iteration + ($produks->currentPage()-1) * $produks->perPage() }}</td>
                         <td>{{ $produk->nama_produk }}</td>
                         <td>{{ $produk->umkm->nama_usaha }}</td>
                         <td>Rp {{ number_format($produk->harga, 0, ',', '.') }}</td>
@@ -79,6 +79,12 @@
                     @endforeach
                 </tbody>
             </table>
+
+            <!-- PAGINATION -->
+            <div class="mt-3">
+                {{ $produks->links('pagination::bootstrap-5') }}
+            </div>
+
         </div>
         @else
         <div class="text-center py-5">

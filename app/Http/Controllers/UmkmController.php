@@ -10,13 +10,14 @@ class UmkmController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // Ambil data dari database
-        $umkms = Umkm::all();
+   public function index()
+{
+    // Ambil data menggunakan pagination
+    $umkms = Umkm::paginate(10); // 10 data per halaman
 
-        return view('pages.umkm.index', compact('umkms'));
-    }
+    return view('pages.umkm.index', compact('umkms'));
+}
+
 
     /**
      * Show the form for creating a new resource.

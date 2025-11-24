@@ -12,8 +12,8 @@ class PesananController extends Controller
      */
     public function index()
     {
-        // Ambil semua pesanan dari database
-        $pesanans = Pesanan::all();
+        // Ambil pesanan terbaru dengan pagination
+        $pesanans = Pesanan::orderBy('created_at', 'desc')->paginate(10);
 
         return view('pages.pesanan.index', compact('pesanans'));
     }
@@ -21,32 +21,29 @@ class PesananController extends Controller
     /**
      * Display pesanan baru
      */
-    public function baru()
-    {
-        // Ambil pesanan dengan status Baru
-        $pesanans = Pesanan::where('status', 'Baru')->get();
-
-        return view('pages.pesanan.baru', compact('pesanans'));
-    }
-
-    /**
-     * Display pesanan diproses
-     */
-    public function diproses()
-    {
-        // Ambil pesanan dengan status Diproses
-        $pesanans = Pesanan::where('status', 'Diproses')->get();
-
-        return view('pages.pesanan.diproses', compact('pesanans'));
-    }
-
-    /**
-     * Display pesanan selesai
-     */
-    public function selesai()
+   public function baru()
 {
-    // Ambil pesanan dengan status Selesai
-    $pesanans = Pesanan::where('status', 'Selesai')->get();
+    $pesanans = Pesanan::where('status', 'Baru')
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(5);
+
+    return view('pages.pesanan.baru', compact('pesanans'));
+}
+
+public function diproses()
+{
+    $pesanans = Pesanan::where('status', 'Diproses')
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(5);
+
+    return view('pages.pesanan.diproses', compact('pesanans'));
+}
+
+public function selesai()
+{
+    $pesanans = Pesanan::where('status', 'Selesai')
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(5);
 
     return view('pages.pesanan.selesai', compact('pesanans'));
 }
@@ -59,7 +56,7 @@ class PesananController extends Controller
         // Ambil data pesanan dari database
         $pesanan = Pesanan::findOrFail($id);
 
-        return view('pages.pesanan.show', compact('pesanan'));
+        return view('pesanan.show', compact('pesanan'));
     }
 
     /**

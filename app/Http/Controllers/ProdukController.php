@@ -13,8 +13,8 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        // Ambil data dari database dengan relasi UMKM
-        $produks = Produk::with('umkm')->get();
+        // Ambil data dari database dengan relasi UMKM + pagination
+        $produks = Produk::with('umkm')->paginate(10); // ⬅ PAGINATION
 
         return view('pages.produk.index', compact('produks'));
     }
@@ -45,7 +45,6 @@ class ProdukController extends Controller
         ]);
 
         try {
-            // Simpan data ke database
             Produk::create([
                 'nama_produk' => $request->nama_produk,
                 'umkm_id' => $request->umkm_id,
@@ -70,7 +69,6 @@ class ProdukController extends Controller
      */
     public function show($id)
     {
-        // Ambil data dari database dengan relasi UMKM
         $produk = Produk::with('umkm')->findOrFail($id);
 
         return view('pages.produk.show', compact('produk'));
@@ -81,7 +79,6 @@ class ProdukController extends Controller
      */
     public function edit($id)
     {
-        // Ambil data produk dan UMKM
         $produk = Produk::findOrFail($id);
         $umkms = Umkm::where('status', 'Aktif')->get();
 
@@ -103,7 +100,6 @@ class ProdukController extends Controller
         ]);
 
         try {
-            // Update data di database
             $produk = Produk::findOrFail($id);
             $produk->update([
                 'nama_produk' => $request->nama_produk,
@@ -114,7 +110,8 @@ class ProdukController extends Controller
                 'status' => $request->status
             ]);
 
-            return redirect()->route('pages.produk.index')
+            // BUG FIX: route sebelumnya salah
+            return redirect()->route('produk.index')
                             ->with('success', 'Produk berhasil diperbarui!');
 
         } catch (\Exception $e) {
@@ -130,7 +127,6 @@ class ProdukController extends Controller
     public function destroy($id)
     {
         try {
-            // Hapus data dari database
             $produk = Produk::findOrFail($id);
             $produk->delete();
 

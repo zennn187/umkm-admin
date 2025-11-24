@@ -45,7 +45,7 @@
                 <tbody>
                     @foreach($umkms as $umkm)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $loop->iteration + ($umkms->currentPage()-1) * $umkms->perPage() }}</td>
                         <td>{{ $umkm->nama_usaha }}</td>
                         <td>{{ $umkm->pemilik }}</td>
                         <td>{{ $umkm->alamat }}, RT {{ $umkm->rt }}/RW {{ $umkm->rw }}</td>
@@ -77,6 +77,11 @@
                     @endforeach
                 </tbody>
             </table>
+
+            <!-- PAGINATION -->
+            <div class="mt-3">
+                {{ $umkms->links('pagination::bootstrap-5') }}
+            </div>
         </div>
         @else
         <div class="text-center py-5">

@@ -33,7 +33,7 @@ class LaporanController extends Controller
             ['nama' => 'Sabun Bolong', 'terjual' => 28, 'pendapatan' => 840000]
         ];
 
-        return view('pages.laporan.produk', compact('produkTerlaris'));
+        return view('laporan.produk', compact('produkTerlaris'));
     }
 
     /**
@@ -48,6 +48,6 @@ class LaporanController extends Controller
             ['nama' => 'UMKM UNILAK', 'produk' => 5, 'penjualan' => 950000, 'rating' => 4.2]
         ];
 
-        return view('pages.laporan.umkm', compact('umkmStats'));
+        return view('laporan.umkm', compact('umkmStats'));
     }
 }
