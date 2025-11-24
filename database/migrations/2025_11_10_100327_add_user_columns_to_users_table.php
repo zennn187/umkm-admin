@@ -8,18 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('phone')->nullable()->after('email');
-            $table->text('alamat')->nullable()->after('phone');
-            $table->string('role')->default('user')->after('alamat');
-            $table->boolean('is_active')->default(true)->after('role');
-        });
+
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['phone', 'alamat', 'role', 'is_active']);
-        });
+
     }
 };
