@@ -96,3 +96,6 @@ Route::get('/pesanan/selesai', [PesananControllex1r::class, 'selesai'])->name('p
 Route::resource('users', UserController::class);
 Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.password');
 Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+// Route untuk menghapus photo via AJAX
+Route::delete('/umkm-photos/{photo}', [UmkmController::class, 'deletePhoto'])->name('umkm.photos.delete');

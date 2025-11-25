@@ -10,8 +10,19 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('users.store') }}">
+                    <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
                         @csrf
+
+                        <!-- Foto Profil -->
+                        <div class="mb-3 text-center">
+                            <label for="photo" class="form-label">Foto Profil</label>
+                            <input type="file" class="form-control @error('photo') is-invalid @enderror"
+                                   id="photo" name="photo" accept="image/*">
+                            <small class="text-muted">Format: JPEG, PNG, JPG, GIF. Maksimal: 2MB</small>
+                            @error('photo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <!-- Nama Lengkap -->
                         <div class="mb-3">

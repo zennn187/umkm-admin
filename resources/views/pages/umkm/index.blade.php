@@ -117,6 +117,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Foto</th>
                         <th>Nama Usaha</th>
                         <th>Pemilik</th>
                         <th>Alamat</th>
@@ -131,10 +132,40 @@
                     <tr>
                         <td>{{ $loop->iteration + ($umkms->currentPage()-1) * $umkms->perPage() }}</td>
                         <td>
-                            <strong>{{ $umkm->nama_usaha }}</strong>
-                            @if($umkm->status == 'Nonaktif')
-                                <br><small class="text-muted">(Nonaktif)</small>
+                            <!-- Debug Info (sementara) -->
+                            <small class="text-muted d-block" style="font-size: 10px;">
+                                Photos: {{ $umkm->photos->count() }}
+                            </small>
+
+                            @if($umkm->photos->count() > 0)
+                                @php
+                                    $primaryPhoto = $umkm->photos->where('is_primary', true)->first();
+                                    $displayPhoto = $primaryPhoto ?: $umkm->photos->first();
+                                @endphp
+                                <img src="{{ asset('storage/umkm-photos/' . $displayPhoto->photo_path) }}"
+                                     class="rounded-circle"
+                                     style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #e9ecef;"
+                                     alt="{{ $umkm->nama_usaha }}"
+                                     onerror="this.style.display='none';">
+                            @else
+                                <div class="avatar-sm bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center"
+                                     style="width: 45px; height: 45px;">
+                                    <i class="fas fa-store fa-sm"></i>
+                                </div>
                             @endif
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <strong>{{ $umkm->nama_usaha }}</strong>
+                                    @if($umkm->status == 'Nonaktif')
+                                        <br><small class="text-muted">(Nonaktif)</small>
+                                    @endif
+                                    @if($umkm->photos->count() > 0)
+                                        <br><small class="text-muted">{{ $umkm->photos->count() }} foto</small>
+                                    @endif
+                                </div>
+                            </div>
                         </td>
                         <td>{{ $umkm->pemilik }}</td>
                         <td>

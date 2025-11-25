@@ -13,9 +13,38 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('users.update', $user->id) }}" method="POST">
+                    <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
+                        <!-- Foto Profil -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="text-center">
+                                    @if($user->photo)
+                                        <img src="{{ asset('storage/photos/' . $user->photo) }}"
+                                             alt="Foto Profil"
+                                             class="img-thumbnail rounded-circle mb-3"
+                                             style="width: 150px; height: 150px; object-fit: cover;">
+                                    @else
+                                        <img src="{{ asset('images/default-avatar.png') }}"
+                                             alt="Foto Profil Default"
+                                             class="img-thumbnail rounded-circle mb-3"
+                                             style="width: 150px; height: 150px; object-fit: cover;">
+                                    @endif
+                                    <div>
+                                        <label for="photo" class="form-label">Foto Profil</label>
+                                        <input type="file" class="form-control @error('photo') is-invalid @enderror"
+                                               id="photo" name="photo" accept="image/*">
+                                        <small class="text-muted">Format: JPEG, PNG, JPG, GIF. Maksimal: 2MB</small>
+                                        @error('photo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -39,6 +68,7 @@
                             </div>
                         </div>
 
+                        <!-- Sisanya tetap sama -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">

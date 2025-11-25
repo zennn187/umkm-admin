@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -30,31 +31,42 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        'role' => 'required|in:admin,user',
-        'phone' => 'nullable|string|max:15',
-        'alamat' => 'nullable|string|max:500', // Pastikan 'alamat' bukan 'address'
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:admin,user',
+            'phone' => 'nullable|string|max:15',
+            'alamat' => 'nullable|string|max:500',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => $request->role,
-        'phone' => $request->phone,
-        'alamat' => $request->alamat, // Pastikan 'alamat' bukan 'address'
-        'is_active' => true,
-    ]);
+        $photoName = null;
+        if ($request->hasFile('photo')) {
+            $photo = $request->file('photo');
+            $photoName = time() . '_' . $photo->getClientOriginalName();
+            $photo->storeAs('public/photos', $photoName);
+        }
 
-    return redirect()->route('users.index')
-        ->with('success', 'User berhasil ditambahkan!');
-}
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'phone' => $request->phone,
+            'alamat' => $request->alamat,
+            'photo' => $photoName,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('users.index')
+            ->with('success', 'User berhasil ditambahkan!');
+    }
+
     /**
      * Display the specified resource.
+     * TAMBAHKAN/MODIFIKASI METHOD INI
      */
     public function show(User $user)
     {
@@ -79,19 +91,34 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,user',
             'phone' => 'nullable|string|max:15',
-            'alamat' => 'nullable|string|max:500', // Diubah dari 'address' menjadi 'alamat'
-            'address' => 'nullable|string|max:500',
+            'alamat' => 'nullable|string|max:500',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean'
         ]);
 
-        $user->update([
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
             'phone' => $request->phone,
-            'alamat' => $request->alamat, // Diubah dari 'address' menjadi 'alamat'
+            'alamat' => $request->alamat,
             'is_active' => $request->has('is_active'),
-        ]);
+        ];
+
+        // Handle upload foto
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
+                Storage::delete('public/photos/' . $user->photo);
+            }
+
+            $photo = $request->file('photo');
+            $photoName = time() . '_' . $photo->getClientOriginalName();
+            $photo->storeAs('public/photos', $photoName);
+            $data['photo'] = $photoName;
+        }
+
+        $user->update($data);
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil diupdate!');
@@ -106,6 +133,11 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return redirect()->route('users.index')
                 ->with('error', 'Tidak dapat menghapus akun sendiri!');
+        }
+
+        // Hapus foto jika ada
+        if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
+            Storage::delete('public/photos/' . $user->photo);
         }
 
         $user->delete();

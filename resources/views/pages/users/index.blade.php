@@ -35,6 +35,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Foto</th>
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
@@ -48,10 +49,20 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        @if($user->photo)
+                                            <img src="{{ asset('storage/photos/' . $user->photo) }}"
+                                                 alt="Foto Profil {{ $user->name }}"
+                                                 class="rounded-circle"
+                                                 style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #e9ecef;">
+                                        @else
+                                            <div class="avatar-sm bg-primary rounded-circle text-white d-flex align-items-center justify-content-center"
+                                                 style="width: 45px; height: 45px; font-size: 16px; font-weight: bold;">
                                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
                                             <div>
                                                 <strong>{{ $user->name }}</strong>
                                                 @if($user->id === auth()->id())
@@ -101,7 +112,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
+                                    <td colspan="8" class="text-center py-4">
                                         <i class="fas fa-users fa-2x text-muted mb-3"></i>
                                         <p class="text-muted">Belum ada user terdaftar.</p>
                                         <a href="{{ route('users.create') }}" class="btn btn-primary">

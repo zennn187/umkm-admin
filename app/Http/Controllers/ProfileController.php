@@ -1,13 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
+    // UserController.php
     public function index()
     {
-        return view('profile');
+        $users = User::with('profile')->paginate(10);
+        return view('users.index', compact('users'));
     }
 }
