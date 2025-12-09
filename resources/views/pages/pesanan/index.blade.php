@@ -84,7 +84,7 @@
 
             <div class="table-responsive">
                 <table class="table table-bordered table-striped align-middle">
-                    <thead class="table-dark">
+                    <thead class="table">
                         <tr>
                             <th>No</th>
                             <th>Nomor Pesanan</th>

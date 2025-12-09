@@ -26,7 +26,9 @@ Route::middleware('guest')->group(function () {
 // Route yang membutuhkan authentication - SISTEM UMKM
 Route::middleware('auth')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware('checkislogin');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 
     // Data Master - UMKM
@@ -99,3 +101,7 @@ Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'
 
 // Route untuk menghapus photo via AJAX
 Route::delete('/umkm-photos/{photo}', [UmkmController::class, 'deletePhoto'])->name('umkm.photos.delete');
+
+Route::group(['middleware'=>['checkislogin']],function(){
+    // Tambahkan route yang memerlukan middleware CheckIsLogin di sini
+});

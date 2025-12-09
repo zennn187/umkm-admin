@@ -85,4 +85,14 @@ class AuthController extends Controller
 
        return redirect('/')->with('success', 'Logout berhasil!');
     }
+
+public function handle(Request $request, Closure $next): Response
+{
+		if (!Auth::check()) {
+		    return redirect()->route('auth.login')->withErrors('Silahkan login terlebih dahulu!');
+		}
+
+		return $next($request);
+}
+
 }
