@@ -32,7 +32,7 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">Nama Pemilik</label>
-                                                <p class="form-control-plaintext">{{ $umkm->pemilik }}</p>
+                                                <p class="form-control-plaintext">{{ $umkm->pemilik->name ?? 'Tidak diketahui' }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -67,16 +67,6 @@
                                                 <p class="form-control-plaintext">{{ $umkm->rw }}</p>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Status</label>
-                                                <p>
-                                                    <span class="badge bg-{{ $umkm->status == 'Aktif' ? 'success' : 'danger' }}">
-                                                        {{ $umkm->status }}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <div class="mb-3">
@@ -105,43 +95,91 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- File Pendukung -->
+                            @if($umkm->media->count() > 0)
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">File Pendukung</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        @foreach($umkm->media as $media)
+                                            <div class="col-md-3 col-sm-4 col-6 mb-3">
+                                                <div class="card h-100 border">
+                                                    @if(strpos($media->mime_type, 'image') !== false)
+                                                        <img src="{{ asset('storage/' . $media->file_path) }}"
+                                                             class="card-img-top"
+                                                             style="height: 150px; object-fit: cover; cursor: pointer;"
+                                                             data-bs-toggle="modal"
+                                                             data-bs-target="#mediaModal"
+                                                             data-media-src="{{ asset('storage/' . $media->file_path) }}"
+                                                             data-media-name="{{ $media->original_name }}"
+                                                             data-media-caption="{{ $media->caption }}"
+                                                             data-media-type="image"
+                                                             alt="{{ $media->caption ?? 'File UMKM' }}"
+                                                             onerror="this.onerror=null; this.src='{{ asset('images/default-image.jpg') }}';">
+                                                    @else
+                                                        <div class="card-body text-center" style="height: 150px; display: flex; flex-direction: column; justify-content: center; cursor: pointer;"
+                                                             data-bs-toggle="modal"
+                                                             data-bs-target="#mediaModal"
+                                                             data-media-src="{{ asset('storage/' . $media->file_path) }}"
+                                                             data-media-name="{{ $media->original_name }}"
+                                                             data-media-caption="{{ $media->caption }}"
+                                                             data-media-type="{{ $media->mime_type }}">
+                                                            @if(strpos($media->mime_type, 'pdf') !== false)
+                                                                <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+                                                            @elseif(strpos($media->mime_type, 'word') !== false)
+                                                                <i class="fas fa-file-word fa-3x text-primary mb-2"></i>
+                                                            @elseif(strpos($media->mime_type, 'excel') !== false || strpos($media->mime_type, 'spreadsheet') !== false)
+                                                                <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
+                                                            @else
+                                                                <i class="fas fa-file fa-3x text-secondary mb-2"></i>
+                                                            @endif
+                                                            <p class="card-text small text-truncate">{{ $media->original_name }}</p>
+                                                        </div>
+                                                    @endif
+                                                    @if($media->caption)
+                                                        <div class="card-footer small bg-light">
+                                                            <div class="text-truncate" title="{{ $media->caption }}">
+                                                                {{ $media->caption }}
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="col-md-4">
-                            <!-- Gallery Photos -->
+                            <!-- Statistik -->
                             <div class="card mb-4">
                                 <div class="card-header bg-light">
-                                    <h5 class="card-title mb-0">Gallery Foto</h5>
+                                    <h5 class="card-title mb-0">Statistik</h5>
                                 </div>
                                 <div class="card-body">
-                                    @if($umkm->photos->count() > 0)
-                                        <div class="row g-2">
-                                            @foreach($umkm->photos as $photo)
-                                                <div class="col-6">
-                                                    <div class="photo-gallery-item position-relative">
-                                                        <img src="{{ asset('storage/umkm-photos/' . $photo->photo_path) }}"
-                                                             class="img-fluid rounded"
-                                                             style="width: 100%; height: 120px; object-fit: cover; cursor: pointer;"
-                                                             data-bs-toggle="modal" data-bs-target="#photoModal"
-                                                             data-photo-src="{{ asset('storage/umkm-photos/' . $photo->photo_path) }}"
-                                                             data-photo-name="{{ $photo->photo_name }}"
-                                                             alt="{{ $photo->photo_name }}"
-                                                             onerror="this.src='{{ asset('images/default-umkm.jpg') }}'">
-                                                        @if($photo->is_primary)
-                                                            <span class="position-absolute top-0 start-0 badge bg-primary m-1">
-                                                                Utama
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>Jumlah File</span>
+                                            <span class="badge bg-primary rounded-pill">{{ $umkm->media->count() }}</span>
                                         </div>
-                                    @else
-                                        <div class="text-center py-4">
-                                            <i class="fas fa-images fa-2x text-muted mb-3"></i>
-                                            <p class="text-muted">Belum ada foto</p>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>Kategori</span>
+                                            <span class="badge bg-secondary">{{ $umkm->kategori }}</span>
                                         </div>
-                                    @endif
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>Lokasi</span>
+                                            <span>RT {{ $umkm->rt }}/RW {{ $umkm->rw }}</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>Dibuat</span>
+                                            <span>{{ $umkm->created_at->format('d/m/Y') }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -177,55 +215,82 @@
     </div>
 </div>
 
-<!-- Photo Modal -->
-<div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+<!-- Media Modal -->
+<div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="photoModalLabel">Detail Foto</h5>
+                <h5 class="modal-title" id="mediaModalLabel">Detail File</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalPhoto" src="" class="img-fluid" style="max-height: 70vh;" alt="Modal Photo">
-                <p id="modalPhotoName" class="mt-2 text-muted"></p>
+                <div id="mediaContent"></div>
+                <p id="modalMediaName" class="mt-2 text-muted"></p>
+                <p id="modalMediaCaption" class="mt-1 text-muted"></p>
             </div>
             <div class="modal-footer">
+                <a id="downloadMedia" href="#" class="btn btn-primary" download>
+                    <i class="fas fa-download me-2"></i>Download
+                </a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
-<style>
-.photo-gallery-item:hover img {
-    transform: scale(1.05);
-    transition: transform 0.2s;
-}
-.photo-gallery-item {
-    margin-bottom: 10px;
-}
-</style>
-
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const photoModal = document.getElementById('photoModal');
-    const modalPhoto = document.getElementById('modalPhoto');
-    const modalPhotoName = document.getElementById('modalPhotoName');
+    const mediaModal = document.getElementById('mediaModal');
+    const mediaContent = document.getElementById('mediaContent');
+    const modalMediaName = document.getElementById('modalMediaName');
+    const modalMediaCaption = document.getElementById('modalMediaCaption');
+    const downloadMedia = document.getElementById('downloadMedia');
 
-    if (photoModal) {
-        photoModal.addEventListener('show.bs.modal', function(event) {
+    if (mediaModal) {
+        mediaModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
-            const photoSrc = button.getAttribute('data-photo-src');
-            const photoName = button.getAttribute('data-photo-name');
+            const mediaSrc = button.getAttribute('data-media-src');
+            const mediaName = button.getAttribute('data-media-name');
+            const mediaCaption = button.getAttribute('data-media-caption');
+            const mediaType = button.getAttribute('data-media-type');
 
-            if (modalPhoto) {
-                modalPhoto.src = photoSrc;
+            downloadMedia.href = mediaSrc;
+
+            if (modalMediaName) {
+                modalMediaName.textContent = mediaName;
             }
-            if (modalPhotoName) {
-                modalPhotoName.textContent = photoName;
+            if (modalMediaCaption) {
+                modalMediaCaption.textContent = mediaCaption || '(Tidak ada caption)';
+            }
+
+            if (mediaContent) {
+                if (mediaType.includes('image')) {
+                    mediaContent.innerHTML = `
+                        <img src="${mediaSrc}" class="img-fluid" style="max-height: 70vh;" alt="${mediaName}">
+                    `;
+                } else if (mediaType.includes('pdf')) {
+                    mediaContent.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-file-pdf fa-3x mb-3"></i>
+                            <p>File PDF: ${mediaName}</p>
+                            <p class="small">Silakan download untuk melihat isi file</p>
+                        </div>
+                    `;
+                } else {
+                    mediaContent.innerHTML = `
+                        <div class="alert alert-secondary">
+                            <i class="fas fa-file fa-3x mb-3"></i>
+                            <p>File: ${mediaName}</p>
+                            <p class="small">Tipe: ${mediaType}</p>
+                            <p class="small">Silakan download untuk melihat isi file</p>
+                        </div>
+                    `;
+                }
             }
         });
     }
 });
 </script>
-@endsection
+@endpush

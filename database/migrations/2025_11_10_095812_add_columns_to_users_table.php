@@ -6,26 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('phone')->nullable()->after('email');
+            $table->string('phone', 20)->nullable()->after('role');
             $table->text('alamat')->nullable()->after('phone');
-            $table->string('role')->default('user')->after('alamat');
-            $table->boolean('is_active')->default(true)->after('role');
+            $table->string('photo')->nullable()->after('alamat');
+            $table->boolean('is_active')->default(true)->after('photo');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['phone', 'alamat', 'role', 'is_active']);
+            $table->dropColumn(['phone', 'alamat', 'photo', 'is_active']);
         });
     }
 };

@@ -38,16 +38,6 @@
                            value="{{ request('search') }}">
                 </div>
 
-                {{-- Filter Status --}}
-                <div class="col-md-2">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="">Semua Status</option>
-                        <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                        <option value="Nonaktif" {{ request('status') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                    </select>
-                </div>
-
                 {{-- Filter Kategori --}}
                 <div class="col-md-2">
                     <label for="kategori" class="form-label">Kategori</label>
@@ -94,13 +84,12 @@
 <div class="card">
     <div class="card-body">
         {{-- Info Filter Aktif --}}
-        @if(request()->hasAny(['search', 'status', 'kategori', 'rt', 'rw']))
+        @if(request()->hasAny(['search', 'kategori', 'rt', 'rw']))
         <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
             <div>
                 <i class="fas fa-info-circle"></i>
                 Menampilkan hasil filter:
                 @if(request('search')) <span class="badge bg-primary">Pencarian: "{{ request('search') }}"</span> @endif
-                @if(request('status')) <span class="badge bg-{{ request('status') == 'Aktif' ? 'success' : 'danger' }}">Status: {{ request('status') }}</span> @endif
                 @if(request('kategori')) <span class="badge bg-warning">Kategori: {{ request('kategori') }}</span> @endif
                 @if(request('rt')) <span class="badge bg-info">RT: {{ request('rt') }}</span> @endif
                 @if(request('rw')) <span class="badge bg-info">RW: {{ request('rw') }}</span> @endif
@@ -117,13 +106,12 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Foto</th>
+                        <th>Foto/File</th>
                         <th>Nama Usaha</th>
                         <th>Pemilik</th>
                         <th>Alamat</th>
                         <th>Kategori</th>
                         <th>Kontak</th>
-                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -132,23 +120,31 @@
                     <tr>
                         <td>{{ $loop->iteration + ($umkms->currentPage()-1) * $umkms->perPage() }}</td>
                         <td>
-                            <!-- Debug Info (sementara) -->
-                            <small class="text-muted d-block" style="font-size: 10px;">
-                                Photos: {{ $umkm->photos->count() }}
-                            </small>
-
-                            @if($umkm->photos->count() > 0)
+                            @if($umkm->media->count() > 0)
                                 @php
-                                    $primaryPhoto = $umkm->photos->where('is_primary', true)->first();
-                                    $displayPhoto = $primaryPhoto ?: $umkm->photos->first();
+                                    $firstMedia = $umkm->media->first();
+                                    $isImage = strpos($firstMedia->mime_type, 'image') !== false;
+                                    $fileUrl = asset('storage/' . $firstMedia->file_path);
                                 @endphp
-                                <img src="{{ asset('storage/umkm-photos/' . $displayPhoto->photo_path) }}"
-                                     class="rounded-circle"
-                                     style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #e9ecef;"
-                                     alt="{{ $umkm->nama_usaha }}"
-                                     onerror="this.style.display='none';">
+
+                                @if($isImage)
+                                    <img src="{{ $fileUrl }}"
+                                         class="rounded-circle mt-1"
+                                         style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #28a745;"
+                                         alt="{{ $umkm->nama_usaha }}"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="avatar-sm bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center mt-1"
+                                         style="width: 45px; height: 45px; display: none;">
+                                        <i class="fas fa-store fa-sm"></i>
+                                    </div>
+                                @else
+                                    <div class="avatar-sm bg-info rounded-circle text-white d-flex align-items-center justify-content-center mt-1"
+                                         style="width: 45px; height: 45px;">
+                                        <i class="fas fa-file fa-sm"></i>
+                                    </div>
+                                @endif
                             @else
-                                <div class="avatar-sm bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center"
+                                <div class="avatar-sm bg-secondary rounded-circle text-white d-flex align-items-center justify-content-center mt-1"
                                      style="width: 45px; height: 45px;">
                                     <i class="fas fa-store fa-sm"></i>
                                 </div>
@@ -158,16 +154,13 @@
                             <div class="d-flex align-items-center">
                                 <div>
                                     <strong>{{ $umkm->nama_usaha }}</strong>
-                                    @if($umkm->status == 'Nonaktif')
-                                        <br><small class="text-muted">(Nonaktif)</small>
-                                    @endif
-                                    @if($umkm->photos->count() > 0)
-                                        <br><small class="text-muted">{{ $umkm->photos->count() }} foto</small>
+                                    @if($umkm->media->count() > 0)
+                                        <br><small class="text-muted">{{ $umkm->media->count() }} file</small>
                                     @endif
                                 </div>
                             </div>
                         </td>
-                        <td>{{ $umkm->pemilik }}</td>
+                        <td>{{ $umkm->pemilik->name ?? 'Tidak diketahui' }}</td>
                         <td>
                             {{ Str::limit($umkm->alamat, 30) }},
                             <br><small class="text-muted">RT {{ $umkm->rt }}/RW {{ $umkm->rw }}</small>
@@ -176,11 +169,6 @@
                             <span class="badge bg-secondary">{{ $umkm->kategori }}</span>
                         </td>
                         <td>{{ $umkm->kontak }}</td>
-                        <td>
-                            <span class="badge bg-{{ $umkm->status == 'Aktif' ? 'success' : 'danger' }}">
-                                {{ $umkm->status }}
-                            </span>
-                        </td>
                         <td>
                             <div class="btn-group">
                                 <a href="{{ route('umkm.show', $umkm->umkm_id) }}" class="btn btn-sm btn-info" title="Detail">
@@ -211,7 +199,7 @@
         @else
         <div class="text-center py-5">
             <i class="fas fa-building fa-3x text-muted mb-3"></i>
-            @if(request()->hasAny(['search', 'status', 'kategori', 'rt', 'rw']))
+            @if(request()->hasAny(['search', 'kategori', 'rt', 'rw']))
                 <h5>Tidak ada UMKM yang sesuai dengan filter</h5>
                 <p class="text-muted">Coba ubah kriteria pencarian atau filter Anda.</p>
                 <a href="{{ route('umkm.index') }}" class="btn btn-primary">

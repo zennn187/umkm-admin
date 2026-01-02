@@ -3,30 +3,41 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Umkm;
 use Faker\Factory as Faker;
 
 class UmkmSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
         $faker = Faker::create('id_ID');
 
-        for ($i = 1; $i <= 20; $i++) {
-            DB::table('umkm')->insert([
-                'nama_usaha'      => $faker->company,
-                'pemilik_warga_id'=> $faker->optional()->numerify('WID###'),
-                'pemilik'         => $faker->name,
-                'alamat'          => $faker->address,
-                'rt'              => str_pad($faker->numberBetween(1, 10), 3, '0', STR_PAD_LEFT),
-                'rw'              => str_pad($faker->numberBetween(1, 10), 3, '0', STR_PAD_LEFT),
-                'kategori'        => $faker->randomElement(['Kuliner', 'Jasa', 'Pakaian', 'Kerajinan', 'Pertanian']),
-                'kontak'          => $faker->phoneNumber,
-                'deskripsi'       => $faker->sentence(10),
-                'status'          => $faker->randomElement(['Aktif', 'Nonaktif']),
-                'created_at'      => now(),
-                'updated_at'      => now(),
+        // Data dummy 22 UMKM
+        for ($i = 1; $i <= 30; $i++) {
+            Umkm::create([
+                'nama_usaha' => $faker->company(),
+                'pemilik' => $faker->name(),
+                'alamat' => $faker->address(),
+                'rt' => $faker->numberBetween(1, 10),
+                'rw' => $faker->numberBetween(1, 10),
+                'kategori' => $faker->randomElement(['Kerajinan', 'Makanan', 'Jasa', 'Pertanian', 'Teknologi']),
+                'kontak' => $faker->phoneNumber(),
+                'status' => $faker->randomElement(['Aktif', 'Tidak Aktif']),
+                'foto' => null,
             ]);
         }
+
+        // Data real yang Anda tambahkan manual
+        Umkm::create([
+            'nama_usaha' => 'Bouquet Bunga',
+            'pemilik' => 'Fitri Mutia',
+            'alamat' => 'JL Inti Sari, RT 2/RW 3',
+            'rt' => '2',
+            'rw' => '3',
+            'kategori' => 'Kerajinan',
+            'kontak' => '0887654567',
+            'status' => 'Aktif',
+            'foto' => '1763714793_22_0.jpg',
+        ]);
     }
 }

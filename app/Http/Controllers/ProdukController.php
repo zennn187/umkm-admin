@@ -21,6 +21,7 @@ class ProdukController extends Controller
             $search = $request->search;
             $produks->where(function($query) use ($search) {
                 $query->where('nama_produk', 'like', "%{$search}%")
+                      ->orWhere('jenis_produk', 'like', "%{$search}%") // TAMBAHKAN
                       ->orWhere('deskripsi', 'like', "%{$search}%")
                       ->orWhereHas('umkm', function($q) use ($search) {
                           $q->where('nama_usaha', 'like', "%{$search}%");
@@ -47,6 +48,11 @@ class ProdukController extends Controller
             }
         }
 
+        // Filter jenis produk
+        if ($request->has('jenis_produk') && $request->jenis_produk != '') {
+            $produks->where('jenis_produk', $request->jenis_produk);
+        }
+
         // Ambil data dengan pagination
         $produks = $produks->orderBy('created_at', 'desc')->paginate(10);
 
@@ -56,7 +62,10 @@ class ProdukController extends Controller
         // Ambil data UMKM untuk dropdown filter
         $umkms = Umkm::where('status', 'Aktif')->get();
 
-        return view('pages.produk.index', compact('produks', 'umkms'));
+        // Ambil jenis produk unik untuk filter
+        $jenisProduk = Produk::select('jenis_produk')->distinct()->whereNotNull('jenis_produk')->pluck('jenis_produk');
+
+        return view('pages.produk.index', compact('produks', 'umkms', 'jenisProduk'));
     }
 
     /**
@@ -76,18 +85,20 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_produk' => 'required|string|max:255',
+            'nama_produk' => 'required|string|max:100',
             'umkm_id' => 'required|exists:umkm,umkm_id',
-            'deskripsi' => 'required|string',
+            'jenis_produk' => 'nullable|string|max:100', // TAMBAHKAN
+            'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'status' => 'required|in:Tersedia,Habis,Preorder'
+            'status' => 'required|in:Aktif,Nonaktif' // SESUAIKAN
         ]);
 
         try {
             Produk::create([
                 'nama_produk' => $request->nama_produk,
                 'umkm_id' => $request->umkm_id,
+                'jenis_produk' => $request->jenis_produk,
                 'deskripsi' => $request->deskripsi,
                 'harga' => $request->harga,
                 'stok' => $request->stok,
@@ -131,12 +142,13 @@ class ProdukController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_produk' => 'required|string|max:255',
+            'nama_produk' => 'required|string|max:100',
             'umkm_id' => 'required|exists:umkm,umkm_id',
-            'deskripsi' => 'required|string',
+            'jenis_produk' => 'nullable|string|max:100', // TAMBAHKAN
+            'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'status' => 'required|in:Tersedia,Habis,Preorder'
+            'status' => 'required|in:Aktif,Nonaktif' // SESUAIKAN
         ]);
 
         try {
@@ -144,6 +156,7 @@ class ProdukController extends Controller
             $produk->update([
                 'nama_produk' => $request->nama_produk,
                 'umkm_id' => $request->umkm_id,
+                'jenis_produk' => $request->jenis_produk,
                 'deskripsi' => $request->deskripsi,
                 'harga' => $request->harga,
                 'stok' => $request->stok,
@@ -176,20 +189,5 @@ class ProdukController extends Controller
             return redirect()->back()
                             ->with('error', 'Gagal menghapus produk: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Display kategori produk
-     */
-    public function kategori()
-    {
-        $kategories = [
-            ['id' => 1, 'nama' => 'Makanan & Minuman', 'jumlah_produk' => 45],
-            ['id' => 2, 'nama' => 'Kerajinan Tangan', 'jumlah_produk' => 23],
-            ['id' => 3, 'nama' => 'Fashion', 'jumlah_produk' => 18],
-            ['id' => 4, 'nama' => 'Kesehatan & Kecantikan', 'jumlah_produk' => 12]
-        ];
-
-        return view('pages.produk.kategori', compact('kategories'));
     }
 }

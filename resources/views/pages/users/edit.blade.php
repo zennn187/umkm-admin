@@ -21,17 +21,10 @@
                         <div class="row mb-4">
                             <div class="col-md-12">
                                 <div class="text-center">
-                                    @if($user->photo)
-                                        <img src="{{ asset('storage/photos/' . $user->photo) }}"
-                                             alt="Foto Profil"
-                                             class="img-thumbnail rounded-circle mb-3"
-                                             style="width: 150px; height: 150px; object-fit: cover;">
-                                    @else
-                                        <img src="{{ asset('images/default-avatar.png') }}"
-                                             alt="Foto Profil Default"
-                                             class="img-thumbnail rounded-circle mb-3"
-                                             style="width: 150px; height: 150px; object-fit: cover;">
-                                    @endif
+                                    <img src="{{ $user->photo_url }}"
+                                         alt="Foto Profil"
+                                         class="img-thumbnail rounded-circle mb-3"
+                                         style="width: 150px; height: 150px; object-fit: cover;">
                                     <div>
                                         <label for="photo" class="form-label">Foto Profil</label>
                                         <input type="file" class="form-control @error('photo') is-invalid @enderror"
@@ -68,15 +61,15 @@
                             </div>
                         </div>
 
-                        <!-- Sisanya tetap sama -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                                     <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                         <option value="">Pilih Role</option>
-                                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
+                                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Super Admin</option>
+                                        <option value="mitra" {{ old('role', $user->role) == 'mitra' ? 'selected' : '' }}>Mitra</option>
+                                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User Biasa</option>
                                     </select>
                                     @error('role')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -96,10 +89,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="address" class="form-label">Alamat</label>
-                            <textarea class="form-control @error('address') is-invalid @enderror"
-                                      id="address" name="address" rows="3">{{ old('address', $user->address) }}</textarea>
-                            @error('address')
+                            <label for="alamat" class="form-label">Alamat</label>
+                            <textarea class="form-control @error('alamat') is-invalid @enderror"
+                                      id="alamat" name="alamat" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
+                            @error('alamat')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -107,7 +100,7 @@
                         <div class="mb-3">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
-                                       {{ $user->is_active ? 'checked' : '' }}>
+                                       value="1" {{ old('is_active', $user->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">User Aktif</label>
                             </div>
                         </div>

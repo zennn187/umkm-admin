@@ -1,107 +1,134 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\PesananController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\WargaController;
+use Illuminate\Support\Facades\Route;
 
-// Route Public
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// ==================== ROUTE PUBLIC ====================
+Route::get('/', function () {
+    return redirect()->route(auth()->check() ? 'dashboard' : 'login');
+});
 
-// Route Authentication
+// ==================== AUTH ROUTES ====================
 Route::middleware('guest')->group(function () {
+    // Login Routes
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Register Routes
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-// Route yang membutuhkan authentication - SISTEM UMKM
-Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware('checkislogin');
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+// Password Reset Routes
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
-    // Data Master - UMKM
-    Route::prefix('umkm')->group(function () {
-        Route::get('/', [UmkmController::class, 'index'])->name('umkm.index');
-        Route::get('/create', [UmkmController::class, 'create'])->name('umkm.create');
-        Route::post('/', [UmkmController::class, 'store'])->name('umkm.store');
-        Route::get('/{id}', [UmkmController::class, 'show'])->name('umkm.show');
-        Route::get('/{id}/edit', [UmkmController::class, 'edit'])->name('umkm.edit');
-        Route::put('/{id}', [UmkmController::class, 'update'])->name('umkm.update');
-        Route::delete('/{id}', [UmkmController::class, 'destroy'])->name('umkm.destroy');
-    });
-
-    // Data Master - Produk
-    Route::prefix('produk')->group(function () {
-        Route::get('/', [ProdukController::class, 'index'])->name('produk.index');
-        Route::get('/create', [ProdukController::class, 'create'])->name('produk.create');
-        Route::post('/', [ProdukController::class, 'store'])->name('produk.store');
-        Route::get('/{id}', [ProdukController::class, 'show'])->name('produk.show');
-        Route::get('/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
-        Route::put('/{id}', [ProdukController::class, 'update'])->name('produk.update');
-        Route::delete('/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
-    });
-
-    // Kategori Produk
-    Route::get('/kategori', [ProdukController::class, 'kategori'])->name('kategori.index');
-
-    // Transaksi - Pesanan
-    Route::prefix('pesanan')->group(function () {
-        Route::get('/', [PesananController::class, 'index'])->name('pesanan.index');
-        Route::get('/baru', [PesananController::class, 'baru'])->name('pesanan.baru');
-        Route::get('/diproses', [PesananController::class, 'diproses'])->name('pesanan.diproses');
-        Route::get('/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
-        Route::get('/{id}', [PesananController::class, 'show'])->name('pesanan.show');
-        Route::put('/{id}/status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
-    });
-
-    // Pembayaran
-    Route::get('/pembayaran', [PesananController::class, 'pembayaran'])->name('pembayaran.index');
-
-    // Laporan
-    Route::prefix('laporan')->group(function () {
-        Route::get('/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
-        Route::get('/produk', [LaporanController::class, 'produk'])->name('laporan.produk');
-        Route::get('/umkm', [LaporanController::class, 'umkm'])->name('laporan.umkm');
-    });
-
-    // Pengaturan
-    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
-
+// ==================== PROTECTED ROUTES (BUTUH LOGIN) ====================
+Route::middleware(['auth'])->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+
+// Media routes
+    Route::prefix('media')->group(function () {
+        Route::post('/upload', [MediaController::class, 'upload'])->name('media.upload');
+        Route::delete('/{id}', [MediaController::class, 'destroy'])->name('media.destroy');
+        Route::put('/{id}/caption', [MediaController::class, 'updateCaption'])->name('media.update-caption');
+        Route::put('/update-order', [MediaController::class, 'updateOrder'])->name('media.update-order');
+    });
+
+    // ========== ROUTES UNTUK SEMUA USER YANG LOGIN ==========
+
+    // UMKM Routes (bisa diakses semua user yang login)
+    Route::resource('umkm', UmkmController::class);
+
+    // Produk Routes (bisa diakses semua user yang login)
+    Route::resource('produk', ProdukController::class);
+
+    // Pesanan Routes
+    Route::prefix('pesanan')->name('pesanan.')->group(function () {
+        Route::get('/', [PesananController::class, 'index'])->name('index');
+        Route::get('/baru', [PesananController::class, 'baru'])->name('baru');
+        Route::get('/diproses', [PesananController::class, 'diproses'])->name('diproses');
+        Route::get('/selesai', [PesananController::class, 'selesai'])->name('selesai');
+        Route::get('/{pesanan}', [PesananController::class, 'show'])->name('show');
+        Route::put('/{pesanan}/status', [PesananController::class, 'updateStatus'])->name('updateStatus');
+    });
+
+    // ========== ROUTES BERDASARKAN ROLE ==========
+
+    // Routes untuk Super Admin SAJA
+    Route::middleware(['checkrole:super_admin'])->group(function () {
+        // User Management (hanya Super Admin)
+        Route::resource('users', UserController::class);
+        Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+        // System Logs (hanya Super Admin)
+        Route::get('/system/logs', function () {
+            return view('pages.system.logs');
+        })->name('system.logs');
+
+        // Warga (hanya Super Admin)
+        Route::resource('warga', WargaController::class);
+    });
+
+    // Routes untuk Super Admin dan Admin
+    Route::middleware(['checkrole:super_admin,admin'])->group(function () {
+        // Laporan Routes
+        Route::prefix('laporan')->name('laporan.')->group(function () {
+            Route::get('/penjualan', [LaporanController::class, 'penjualan'])->name('penjualan');
+            Route::get('/produk', [LaporanController::class, 'produk'])->name('produk');
+            Route::get('/umkm', [LaporanController::class, 'umkm'])->name('umkm');
+        });
+
+        // Pengaturan (Super Admin & Admin)
+        Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+
+        // Pembayaran (Super Admin & Admin)
+        Route::get('/pembayaran', [PesananController::class, 'pembayaran'])->name('pembayaran.index');
+    });
+
+    // Routes untuk Mitra saja
+    Route::middleware(['checkrole:mitra'])->group(function () {
+        Route::get('/mitra/dashboard', [DashboardController::class, 'mitraDashboard'])->name('mitra.dashboard');
+    });
 });
 
-// Fallback route
+// ==================== HELPER FUNCTIONS ====================
+if (! function_exists('formatBytes')) {
+    function formatBytes($bytes, $decimals = 2)
+    {
+        $size   = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $factor = floor((strlen($bytes) - 1) / 3);
+
+        if ($bytes == 0) {
+            return '0 B';
+        }
+
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . $size[$factor];
+    }
+}
+
+// ==================== FALLBACK ROUTE ====================
 Route::fallback(function () {
-    return redirect()->route('home');
-});
-
-// Route home yang bisa diakses semua orang
-Route::get('/', function () {
-    return view('home');
-})->name('home');
-
-Route::get('/pesanan/selesai', [PesananControllex1r::class, 'selesai'])->name('pesanan.selesai');
-
-Route::resource('users', UserController::class);
-Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.password');
-Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-
-// Route untuk menghapus photo via AJAX
-Route::delete('/umkm-photos/{photo}', [UmkmController::class, 'deletePhoto'])->name('umkm.photos.delete');
-
-Route::group(['middleware'=>['checkislogin']],function(){
-    // Tambahkan route yang memerlukan middleware CheckIsLogin di sini
+    return redirect()->route('dashboard');
 });

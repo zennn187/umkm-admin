@@ -96,55 +96,8 @@
     @endif
 
     <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card card-gradient-1 stat-card">
-                <div class="card-body">
-                    <div class="stat-title">TOTAL UMKM</div>
-                    <div class="stat-number">2</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up me-1"></i> +100% dari bulan lalu
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card card-gradient-2 stat-card">
-                <div class="card-body">
-                    <div class="stat-title">PRODUK TERDAFTAR</div>
-                    <div class="stat-number">8</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up me-1"></i> +8% dari bulan lalu
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card card-gradient-3 stat-card">
-                <div class="card-body">
-                    <div class="stat-title">PESANAN BARU</div>
-                    <div class="stat-number">23</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-bell me-1"></i> Perlu diproses
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card card-gradient-4 stat-card">
-                <div class="card-body">
-                    <div class="stat-title">PENDAPATAN BULAN INI</div>
-                    <div class="stat-number">Rp 120Rb</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up me-1"></i> +60% dari bulan lalu
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Quick Actions -->
     <div class="row mb-4">
@@ -188,16 +141,6 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h6>Laporan</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-xl-2 col-md-4 col-6 mb-3">
-            <a href="{{ route('kategori.index') }}" class="text-decoration-none">
-                <div class="quick-action-card">
-                    <div class="icon">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <h6>Kategori</h6>
                 </div>
             </a>
         </div>

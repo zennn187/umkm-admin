@@ -10,12 +10,14 @@ class CheckIsLogin
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        /** Implement your logic to check if user is logged in */
+        if (!Auth()->check()) { // Menggunakan helper function auth()
+            return redirect()->route('login')
+                ->with('error', 'Silakan login terlebih dahulu!');
+        }
+
         return $next($request);
     }
 }

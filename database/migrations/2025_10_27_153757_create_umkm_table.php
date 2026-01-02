@@ -6,26 +6,28 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('umkm', function (Blueprint $table) {
-            $table->id('umkm_id');
-            $table->string('nama_usaha');
-            $table->string('pemilik_warga_id')->nullable(); // FK ke tabel warga
-            $table->string('pemilik'); // Nama pemilik
-            $table->text('alamat');
-            $table->string('rt', 3);
-            $table->string('rw', 3);
-            $table->string('kategori');
-            $table->string('kontak');
-            $table->text('deskripsi');
-            $table->enum('status', ['Aktif', 'Nonaktif'])->default('Aktif');
-            $table->timestamps();
+    $table->id('umkm_id'); // otomatis bigint unsigned auto_increment
+    $table->string('name_usaha');
+    $table->unsignedInteger('pemilik_warga_id'); // HAPUS auto_increment dari sini
+    $table->text('alamat');
+    $table->string('rt', 3);
+    $table->string('rw', 3);
+    $table->string('kategori');
+    $table->string('kontak');
+    $table->text('deskripsi')->nullable();
+    $table->timestamps();
+
+            // Optional: tambahkan foreign key constraint
+            // $table->foreign('pemilik_warga_id')->references('id')->on('users');
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('umkm');
     }
 };
+

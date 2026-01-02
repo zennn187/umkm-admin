@@ -6,21 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('produk', function (Blueprint $table) {
+            // Primary key sesuai struktur: produk_id BIGINT
             $table->id('produk_id');
-            $table->foreignId('umkm_id')->constrained('umkm', 'umkm_id')->onDelete('cascade');
-            $table->string('nama_produk');
-            $table->text('deskripsi');
-            $table->decimal('harga', 15, 2);
+
+            // Foreign key ke tabel umkm
+            $table->unsignedBigInteger('umkm_id');
+
+            // Kolom sesuai struktur tabel
+            $table->string('nama_produk', 100);
+            $table->string('jenis_produk', 100)->nullable(); // TAMBAHKAN INI
+            $table->text('deskripsi')->nullable();
+            $table->decimal('harga', 10, 2); // DECIMAL(10,2)
             $table->integer('stok')->default(0);
-            $table->enum('status', ['Tersedia', 'Habis', 'Preorder'])->default('Tersedia');
+            $table->enum('status', ['Aktif', 'Nonaktif'])->default('Aktif');
+
             $table->timestamps();
+
+            // Foreign key constraint
+            $table->foreign('umkm_id')
+                  ->references('umkm_id') // Pastikan ini sesuai primary key di tabel umkm
+                  ->on('umkm')
+                  ->onDelete('cascade');
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('produk');
     }

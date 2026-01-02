@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
+use App\Models\Umkm;
+use App\Models\Warga;
 
 class PesananController extends Controller
 {
@@ -11,100 +13,96 @@ class PesananController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
+{
+    // Query dasar dengan relasi
+    $pesanans = Pesanan::with(['umkm', 'warga']);
+
+    // Fitur Search
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $pesanans->where(function($query) use ($search) {
+            $query->where('nomor_pesanan', 'like', "%{$search}%")
+                  ->orWhere('alamat_kirim', 'like', "%{$search}%")
+                  ->orWhereHas('umkm', function($q) use ($search) {
+                      $q->where('nama_umkm', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('warga', function($q) use ($search) {
+                      $q->where('nama', 'like', "%{$search}%");
+                  });
+        });
+    }
+
+    // Fitur Filter Status
+    if ($request->has('status') && $request->status != '') {
+        $pesanans->where('status', $request->status);
+    }
+
+    // Filter berdasarkan user role
+    if (auth()->user()->role === 'mitra') {
+        // Mitra hanya lihat pesanan untuk UMKM miliknya
+        $pesanans->whereHas('umkm', function($query) {
+            $query->where('user_id', auth()->id());
+        });
+    } elseif (auth()->user()->role === 'user') {
+        // User biasa hanya lihat pesanan sendiri (berdasarkan warga_id)
+        $pesanans->where('warga_id', auth()->id());
+    }
+
+    // Ambil pesanan terbaru dengan pagination
+    $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(10);
+
+    // Tambahkan parameter request ke pagination
+    $pesanans->appends($request->all());
+
+    return view('pages.pesanan.index', compact('pesanans'));
+}
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        // Query dasar
-        $pesanans = Pesanan::query();
+        // Ambil data untuk dropdown
+        $wargas = Warga::where('status', 'active')->get();
+        $umkms = Umkm::where('status', 'active')->get();
 
-        // Fitur Search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $pesanans->where(function($query) use ($search) {
-                $query->where('nomor_pesanan', 'like', "%{$search}%")
-                      ->orWhere('customer', 'like', "%{$search}%")
-                      ->orWhere('alamat_kirim', 'like', "%{$search}%");
-            });
-        }
-
-        // Fitur Filter Status
-        if ($request->has('status') && $request->status != '') {
-            $pesanans->where('status', $request->status);
-        }
-
-        // Fitur Filter RT
-        if ($request->has('rt') && $request->rt != '') {
-            $pesanans->where('rt', $request->rt);
-        }
-
-        // Fitur Filter RW
-        if ($request->has('rw') && $request->rw != '') {
-            $pesanans->where('rw', $request->rw);
-        }
-
-        // Ambil pesanan terbaru dengan pagination
-        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(10);
-
-        // Tambahkan parameter request ke pagination
-        $pesanans->appends($request->all());
-
-        return view('pages.pesanan.index', compact('pesanans'));
+        return view('pages.pesanan.create', compact('wargas', 'umkms'));
     }
 
     /**
-     * Display pesanan baru
+     * Store a newly created resource in storage.
      */
-    public function baru(Request $request)
+    public function store(Request $request)
     {
-        $pesanans = Pesanan::where('status', 'Baru');
+        $validated = $request->validate([
+            'warga_id' => 'required|exists:warga,id',
+            'umkm_id' => 'required|exists:umkm,id',
+            'total' => 'required|numeric|min:0',
+            'status' => 'required|in:Baru,Diproses,Dikirim,Selesai,Dibatalkan',
+            'alamat_kirim' => 'required|string',
+            'detail_pesanan' => 'nullable|string',
+            'rt' => 'required|string|max:3',
+            'rw' => 'required|string|max:3',
+            'metode_bayar' => 'required|string',
+            'bukti_bayar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-        // Tambahkan search untuk halaman baru
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $pesanans->where(function($query) use ($search) {
-                $query->where('nomor_pesanan', 'like', "%{$search}%")
-                      ->orWhere('customer', 'like', "%{$search}%");
-            });
+        // Generate nomor pesanan
+        $validated['nomor_pesanan'] = Pesanan::generateNomorPesanan();
+
+        // Handle upload bukti bayar
+        if ($request->hasFile('bukti_bayar')) {
+            $file = $request->file('bukti_bayar');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('bukti_bayar', $fileName, 'public');
+            $validated['bukti_bayar'] = $fileName;
         }
 
-        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
-        $pesanans->appends($request->all());
+        // Simpan pesanan
+        Pesanan::create($validated);
 
-        return view('pages.pesanan.baru', compact('pesanans'));
-    }
-
-    public function diproses(Request $request)
-    {
-        $pesanans = Pesanan::where('status', 'Diproses');
-
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $pesanans->where(function($query) use ($search) {
-                $query->where('nomor_pesanan', 'like', "%{$search}%")
-                      ->orWhere('customer', 'like', "%{$search}%");
-            });
-        }
-
-        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
-        $pesanans->appends($request->all());
-
-        return view('pages.pesanan.diproses', compact('pesanans'));
-    }
-
-    public function selesai(Request $request)
-    {
-        $pesanans = Pesanan::where('status', 'Selesai');
-
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $pesanans->where(function($query) use ($search) {
-                $query->where('nomor_pesanan', 'like', "%{$search}%")
-                      ->orWhere('customer', 'like', "%{$search}%");
-            });
-        }
-
-        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
-        $pesanans->appends($request->all());
-
-        return view('pages.pesanan.selesai', compact('pesanans'));
+        return redirect()->route('pesanan.index')
+                        ->with('success', 'Pesanan berhasil dibuat!');
     }
 
     /**
@@ -112,10 +110,8 @@ class PesananController extends Controller
      */
     public function show($id)
     {
-        // Ambil data pesanan dari database
-        $pesanan = Pesanan::findOrFail($id);
-
-        return view('pesanan.show', compact('pesanan'));
+        $pesanan = Pesanan::with(['umkm', 'warga'])->findOrFail($id);
+        return view('pages.pesanan.show', compact('pesanan'));
     }
 
     /**
@@ -128,11 +124,8 @@ class PesananController extends Controller
         ]);
 
         try {
-            // Update status pesanan
             $pesanan = Pesanan::findOrFail($id);
-            $pesanan->update([
-                'status' => $request->status
-            ]);
+            $pesanan->update(['status' => $request->status]);
 
             return redirect()->route('pesanan.show', $id)
                             ->with('success', 'Status pesanan berhasil diperbarui!');
@@ -144,31 +137,95 @@ class PesananController extends Controller
     }
 
     /**
-     * Display data pembayaran
+     * Upload bukti bayar
      */
-    public function pembayaran()
+    public function uploadBuktiBayar(Request $request, $id)
     {
-        $pembayarans = [
-            [
-                'id' => 1,
-                'nomor_pesanan' => 'ORD-0012',
-                'customer' => 'Ahmad Rizki',
-                'jumlah' => 125000,
-                'status' => 'Menunggu Konfirmasi',
-                'metode' => 'Transfer Bank',
-                'tanggal' => '2024-01-20 14:35:00'
-            ],
-            [
-                'id' => 2,
-                'nomor_pesanan' => 'ORD-0011',
-                'customer' => 'Sari Dewi',
-                'jumlah' => 75000,
-                'status' => 'Lunas',
-                'metode' => 'COD',
-                'tanggal' => '2024-01-19 10:15:00'
-            ]
-        ];
+        $request->validate([
+            'bukti_bayar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-        return view('pembayaran.index', compact('pembayarans'));
+        try {
+            $pesanan = Pesanan::findOrFail($id);
+
+            if ($request->hasFile('bukti_bayar')) {
+                $file = $request->file('bukti_bayar');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('bukti_bayar', $fileName, 'public');
+
+                $pesanan->update([
+                    'bukti_bayar' => $fileName,
+                    'status' => 'Diproses' // Otomatis ubah status setelah upload bukti
+                ]);
+            }
+
+            return redirect()->route('pesanan.show', $id)
+                            ->with('success', 'Bukti bayar berhasil diupload!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                            ->with('error', 'Gagal upload bukti bayar: ' . $e->getMessage());
+        }
+    }
+
+    // Method lainnya tetap sama...
+    public function baru(Request $request)
+    {
+        $pesanans = Pesanan::with(['umkm', 'warga'])->where('status', 'Baru');
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhereHas('warga', function($q) use ($search) {
+                          $q->where('nama', 'like', "%{$search}%");
+                      });
+            });
+        }
+
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
+
+        return view('pages.pesanan.baru', compact('pesanans'));
+    }
+
+    public function diproses(Request $request)
+    {
+        $pesanans = Pesanan::with(['umkm', 'warga'])->where('status', 'Diproses');
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhereHas('warga', function($q) use ($search) {
+                          $q->where('nama', 'like', "%{$search}%");
+                      });
+            });
+        }
+
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
+
+        return view('pages.pesanan.diproses', compact('pesanans'));
+    }
+
+    public function selesai(Request $request)
+    {
+        $pesanans = Pesanan::with(['umkm', 'warga'])->where('status', 'Selesai');
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $pesanans->where(function($query) use ($search) {
+                $query->where('nomor_pesanan', 'like', "%{$search}%")
+                      ->orWhereHas('warga', function($q) use ($search) {
+                          $q->where('nama', 'like', "%{$search}%");
+                      });
+            });
+        }
+
+        $pesanans = $pesanans->orderBy('created_at', 'desc')->paginate(5);
+        $pesanans->appends($request->all());
+
+        return view('pages.pesanan.selesai', compact('pesanans'));
     }
 }

@@ -7,6 +7,8 @@
     <title>@yield('title', 'Sistem UMKM')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #5e72e4;
@@ -17,11 +19,17 @@
             --info-color: #11cdef;
             --dark-color: #172b4d;
             --light-color: #f8f9fa;
+            --purple-gradient: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            --blue-gradient: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            --green-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            --orange-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            --red-gradient: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            --pink-gradient: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
         }
 
         /* TAMBAH: Auth page styling */
         body.auth-page {
-            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+            background: var(--purple-gradient) !important;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -40,11 +48,36 @@
         body:not(.auth-page) {
             background-color: #f8f9fe;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
-        /* Sidebar Styles */
+        body:not(.auth-page)::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 249, 254, 0.95);
+            z-index: -1;
+        }
+
+        /* Glass Effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15) !important;
+        }
+
+        /* Sidebar Styles dengan animasi masuk */
         .sidebar {
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: var(--purple-gradient);
             min-height: 100vh;
             position: fixed;
             top: 0;
@@ -53,6 +86,8 @@
             box-shadow: 0 0 45px 0 rgba(0, 0, 0, 0.1);
             z-index: 1000;
             transition: all 0.3s;
+            animation: slideInLeft 0.8s ease-out;
+            transform-origin: left center;
         }
 
         .sidebar-brand {
@@ -60,6 +95,7 @@
             color: white;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInDown 0.8s ease-out;
         }
 
         .sidebar-nav {
@@ -70,28 +106,83 @@
 
         .sidebar-nav-item {
             margin: 5px 15px;
+            animation: fadeInLeft 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        /* Animasi bertahap untuk menu item */
+        .sidebar-nav-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .sidebar-nav-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .sidebar-nav-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .sidebar-nav-item:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .sidebar-nav-item:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .sidebar-nav-item:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .sidebar-nav-item:nth-child(7) {
+            animation-delay: 0.7s;
         }
 
         .sidebar-nav-link {
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             padding: 12px 15px;
-            border-radius: 6px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .sidebar-nav-link:hover::before {
+            left: 100%;
         }
 
         .sidebar-nav-link:hover,
         .sidebar-nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.15);
             color: white;
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-nav-link i {
             width: 20px;
             margin-right: 10px;
-            font-size: 14px;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-nav-link:hover i {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .sidebar-nav-section {
@@ -102,143 +193,461 @@
             letter-spacing: 1px;
             padding: 20px 15px 10px;
             margin-top: 10px;
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .sidebar-nav-subitem {
-            margin-left: 20px;
-        }
-
-        .sidebar-nav-sublink {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .sidebar-nav-sublink:hover,
-        .sidebar-nav-sublink.active {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        .sidebar-nav-sublink i {
-            font-size: 12px;
-            margin-right: 8px;
-        }
-
-        /* Main Content */
+        /* Main Content dengan animasi masuk */
         .main-content {
             margin-left: 280px;
             min-height: 100vh;
             transition: all 0.3s;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
         }
 
         .navbar-main {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             padding: 1rem 2rem;
+            animation: slideDown 0.5s ease-out;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .content-container {
             padding: 2rem;
+            animation: fadeIn 0.8s ease-out 0.5s both;
         }
 
-        /* Card Styles */
-        .dashboard-card {
+        /* User Dropdown Styles - DIPERBAIKI */
+        .user-info {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .user-info:hover {
+            background: rgba(94, 114, 228, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--purple-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .user-details {
+            margin-left: 10px;
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .user-dropdown .dropdown-toggle::after {
+            display: none;
+        }
+
+        .user-dropdown .dropdown-menu {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            margin-top: 10px;
+            animation: slideInDown 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 200px;
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
+        .user-dropdown .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 5px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
         }
 
-        .card-gradient-1 {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        .user-dropdown .dropdown-item:hover {
+            background: var(--purple-gradient);
+            color: white;
+            transform: translateX(5px);
         }
 
-        .card-gradient-2 {
-            background: linear-gradient(135deg, var(--success-color) 0%, #1aae6f 100%);
+        .user-dropdown .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 14px;
         }
 
-        .card-gradient-3 {
-            background: linear-gradient(135deg, var(--warning-color) 0%, #fa3a0e 100%);
+        .user-dropdown .dropdown-divider {
+            margin: 0.5rem 0;
+            opacity: 0.2;
         }
 
-        .card-gradient-4 {
-            background: linear-gradient(135deg, var(--danger-color) 0%, #ec0c38 100%);
+        .user-dropdown .dropdown-item.logout-item {
+            color: #ef4444;
+        }
+
+        .user-dropdown .dropdown-item.logout-item:hover {
+            background: var(--red-gradient);
+            color: white;
+        }
+
+        /* Stats Cards - DITAMBAHKAN */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
-            color: white;
+            border-radius: 15px;
             padding: 1.5rem;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .stat-number {
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        .stat-card>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .stat-title {
-            font-size: 0.875rem;
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            animation: countUp 1s ease-out;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
             opacity: 0.9;
             margin-bottom: 0.5rem;
         }
 
         .stat-change {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
+            gap: 5px;
+            opacity: 0.9;
         }
 
-        /* WhatsApp Floating Button Styles */
+        .stat-change.positive {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-change.negative {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Warna untuk stat cards */
+        .stat-card.total-umkm {
+            background: var(--blue-gradient);
+        }
+
+        .stat-card.total-produk {
+            background: var(--green-gradient);
+        }
+
+        .stat-card.pesanan-baru {
+            background: var(--orange-gradient);
+        }
+
+        .stat-card.penjualan-bulanan {
+            background: var(--red-gradient);
+        }
+
+        .stat-card.user-aktif {
+            background: var(--pink-gradient);
+        }
+
+        .stat-card.rating {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+        }
+
+        /* Profile Card */
+        .profile-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--purple-gradient);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* WhatsApp Floating Button */
         .whatsapp-float {
             position: fixed;
             width: 60px;
             height: 60px;
             bottom: 25px;
             right: 25px;
-            background-color: #25d366;
+            background: linear-gradient(135deg, #25d366, #128C7E);
             color: #FFF;
             border-radius: 50px;
             text-align: center;
             font-size: 30px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.5);
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
             transition: all 0.3s ease;
-            animation: pulse 2s infinite;
+            animation: pulse 2s infinite, float 3s ease-in-out infinite;
+            transform-origin: center;
+            border: 2px solid white;
         }
 
         .whatsapp-float:hover {
-            background-color: #128C7E;
-            transform: scale(1.1);
+            transform: scale(1.15) rotate(10deg);
             color: white;
             text-decoration: none;
+            box-shadow: 0 0 30px rgba(37, 211, 102, 0.8);
         }
 
-        .whatsapp-float i {
-            margin-top: 2px;
+        /* Badge colors */
+        .badge.bg-danger {
+            background: var(--red-gradient) !important;
         }
 
-        /* Pulse animation for WhatsApp button */
+        .badge.bg-warning {
+            background: var(--orange-gradient) !important;
+        }
+
+        .badge.bg-success {
+            background: var(--green-gradient) !important;
+        }
+
+        .badge.bg-info {
+            background: var(--blue-gradient) !important;
+        }
+
+        .badge.bg-primary {
+            background: var(--purple-gradient) !important;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         @keyframes pulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
             }
 
             70% {
-                box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+                box-shadow: 0 0 0 20px rgba(37, 211, 102, 0);
             }
 
             100% {
@@ -262,21 +671,33 @@
             }
 
             .whatsapp-float {
-                width: 55px;
-                height: 55px;
+                width: 50px;
+                height: 50px;
                 bottom: 20px;
                 right: 20px;
-                font-size: 25px;
+                font-size: 24px;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 480px) {
             .whatsapp-float {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
                 bottom: 15px;
                 right: 15px;
-                font-size: 22px;
+                font-size: 20px;
+            }
+
+            .content-container {
+                padding: 1rem;
             }
         }
     </style>
@@ -286,60 +707,91 @@
 <body class="@yield('body-class')">
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Brand -->
         <div class="sidebar-brand">
             <h4 class="mb-0">
-                <i class="fas fa-store"></i> SISTEM UMKM
+                <i class="fas fa-store"></i> UMKM MAKANAN
             </h4>
-            <small class="opacity-75">Manajemen Usaha Mikro</small>
+            <small class="opacity-75">Sistem Manajemen Usaha</small>
         </div>
 
-        <!-- Navigation -->
         <ul class="sidebar-nav">
-            <li class="sidebar-nav-section">DASHBOARD</li>
-            <li class="sidebar-nav-item">
-                <a href="{{ route('dashboard') }}"
-                    class="sidebar-nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-            </li>
+            @auth
+                <li class="sidebar-nav-section">DASHBOARD</li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ route('dashboard') }}"
+                        class="sidebar-nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                @if (auth()->user()->role === 'mitra')
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('mitra.dashboard') }}" class="sidebar-nav-link">
+                            <i class="fas fa-store"></i> Dashboard Mitra
+                        </a>
+                    </li>
+                @endif
+                <li class="sidebar-nav-section">DATA MASTER</li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ route('umkm.index') }}"
+                        class="sidebar-nav-link {{ request()->routeIs('umkm.*') ? 'active' : '' }}">
+                        <i class="fas fa-building"></i> Data UMKM
+                    </a>
+                </li>
 
-            <li class="sidebar-nav-section">DATA MASTER</li>
-            <li class="sidebar-nav-item">
-                <a href="{{ route('umkm.index') }}"
-                    class="sidebar-nav-link {{ request()->is('umkm*') ? 'active' : '' }}">
-                    <i class="fas fa-building"></i> Data UMKM
-                </a>
-            </li>
+                @if (auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('produk.index') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('produk.*') ? 'active' : '' }}">
+                            <i class="fas fa-box"></i> Data Produk
+                        </a>
+                    </li>
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('produk.index') }}"
-                    class="sidebar-nav-link {{ request()->is('produk*') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i> Data Produk
-                </a>
-            </li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('pesanan.index') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}">
+                            <i class="fas fa-shopping-cart"></i> Data Pesanan
+                        </a>
+                    </li>
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('pesanan.index') }}"
-                    class="sidebar-nav-link {{ request()->is('pesanan*') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-cart"></i> Data Pesanan
-                </a>
-            </li>
+                    <li class="sidebar-nav-section">LAPORAN</li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('laporan.penjualan') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
+                            <i class="fas fa-chart-line"></i> Laporan
+                        </a>
+                    </li>
+                @endif
 
-            <li class="sidebar-nav-item">
-                <a href="{{ route('laporan.penjualan') }}"
-                    class="sidebar-nav-link {{ request()->is('laporan/penjualan') ? 'active' : '' }}">
-                    <i class="fas fa-chart-line"></i> Laporan Penjualan
-                </a>
-            </li>
+                @if (auth()->user()->role === 'super_admin' || auth()->user()->role === 'admin')
+                    <li class="sidebar-nav-section">ADMINISTRASI</li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('users.index') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users-cog"></i> Manajemen User
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('warga.index') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('warga.*') ? 'active' : '' }}">
+                            <i class="fas fa-users"></i> Data Warga
+                        </a>
+                    </li>
+                @endif
 
-            <li class="sidebar-nav-section">MANAJEMEN USER</li>
-            <li class="sidebar-nav-item">
-                <a href="{{ route('users.index') }}"
-                    class="sidebar-nav-link {{ request()->is('users*') ? 'active' : '' }}">
-                    <i class="fas fa-users-cog"></i> Manajemen User
-                </a>
-            </li>
+                <li class="sidebar-nav-section">SETTING</li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ route('profile.edit') }}"
+                        class="sidebar-nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                        <i class="fas fa-user-cog"></i> Profile
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{{ route('pengaturan') }}"
+                        class="sidebar-nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
+                        <i class="fas fa-cog"></i> Pengaturan
+                    </a>
+                </li>
+            @endauth
         </ul>
     </div>
 
@@ -359,35 +811,66 @@
                     </div>
 
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-none d-md-block">
-                            <small class="text-muted">Selamat datang,</small>
-                            <strong>{{ Auth::check() ? Auth::user()->name : 'Guest' }}</strong>
-                        </div>
-
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i>
+                        <div class="dropdown user-dropdown">
+                            <button class="btn btn-link p-0" type="button" id="userDropdown" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        {{ substr(Auth::check() ? Auth::user()->name : 'G', 0, 1) }}
+                                    </div>
+                                    <div class="user-details d-none d-md-block">
+                                        <div class="user-name">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</div>
+                                        <div class="user-role">
+                                            @auth
+                                                {{ ucfirst(auth()->user()->role) }}
+                                            @endauth
+                                        </div>
+                                    </div>
+                                </div>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 @auth
-                                    <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user"></i>
-                                            Profile</a></li>
+                                    <li>
+                                        <span class="dropdown-header">
+                                            <strong>{{ Auth::user()->name }}</strong><br>
+                                            <small class="text-muted">{{ Auth::user()->email }}</small>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                        <i class="fas fa-user-circle"></i> Profile Saya
+                                    </a>
+
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                            <i class="fas fa-edit"></i> Edit Profile
+                                        </a>
+                                    </li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li>
-                                        <form method="POST" action="{{ route('logout') }}">
+                                        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                                             @csrf
-                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
-                                                Logout</button>
+                                            <a class="dropdown-item logout-item" href="#"
+                                                onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
+                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                            </a>
                                         </form>
                                     </li>
                                 @else
-                                    <li><a class="dropdown-item" href="{{ route('login') }}"><i
-                                                class="fas fa-sign-in-alt"></i> Login</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('register') }}"><i
-                                                class="fas fa-user-plus"></i> Register</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('login') }}">
+                                            <i class="fas fa-sign-in-alt"></i> Login
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('register') }}">
+                                            <i class="fas fa-user-plus"></i> Register
+                                        </a>
+                                    </li>
                                 @endauth
                             </ul>
                         </div>
@@ -398,6 +881,79 @@
 
         <!-- Page Content -->
         <div class="content-container">
+            <!-- Stats Cards Section - DITAMBAHKAN -->
+            @if (request()->is('dashboard'))
+                <div class="stats-grid">
+                    <div class="stat-card total-umkm">
+                        <div class="stat-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="stat-value" id="totalUmkm">0</div>
+                        <div class="stat-label">Total UMKM</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 12% dari bulan lalu
+                        </div>
+                    </div>
+
+                    <div class="stat-card total-produk">
+                        <div class="stat-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-value" id="totalProduk">0</div>
+                        <div class="stat-label">Produk Terdaftar</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 8% dari bulan lalu
+                        </div>
+                    </div>
+
+                    <div class="stat-card pesanan-baru">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-value" id="pesananBaru">0</div>
+                        <div class="stat-label">Pesanan Baru</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 15% dari kemarin
+                        </div>
+                    </div>
+
+                    <div class="stat-card penjualan-bulanan">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-value">Rp <span id="penjualanBulanan">0</span></div>
+                        <div class="stat-label">Penjualan Bulanan</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 20% dari bulan lalu
+                        </div>
+                    </div>
+
+                    @if (auth()->user()->role === 'super_admin')
+                        <div class="stat-card user-aktif">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-value" id="userAktif">0</div>
+                            <div class="stat-label">User Aktif</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 5% dari bulan lalu
+                            </div>
+                        </div>
+
+                        <div class="stat-card rating">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-value" id="rating">0</div>
+                            <div class="stat-label">Rating Rata-rata</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 0.2 dari bulan lalu
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             @yield('content')
         </div>
     </div>
@@ -410,62 +966,192 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        // TAMBAH: Auto-detect auth pages dan tambah class ke body
         document.addEventListener('DOMContentLoaded', function() {
+            // Deteksi auth pages
             const currentPath = window.location.pathname;
-            const authPaths = ['/login', '/register', '/password/reset'];
+            const authPaths = ['/login', '/register', '/password/reset', '/forgot-password'];
 
-            // Check jika current path adalah auth page
             if (authPaths.some(path => currentPath.includes(path))) {
                 document.body.classList.add('auth-page');
-                console.log('Auth page detected - hiding sidebar');
             }
 
-            // Sidebar Toggle for Mobile
+            // Sidebar Toggle
             document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('active');
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.classList.toggle('active');
             });
 
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(function(alert) {
+            // Initialize Bootstrap dropdowns
+            const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+            dropdownElements.forEach(el => {
+                new bootstrap.Dropdown(el);
+            });
+
+            // Auto-hide alerts
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+                alerts.forEach(alert => {
                     const bsAlert = new bootstrap.Alert(alert);
                     bsAlert.close();
                 });
             }, 5000);
 
-            // Active submenu handling
-            const currentPath2 = window.location.pathname;
-            const sidebarLinks = document.querySelectorAll('.sidebar-nav-link, .sidebar-nav-sublink');
-
-            sidebarLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath2) {
-                    link.classList.add('active');
-                    // Expand parent if it's a sublink
-                    if (link.classList.contains('sidebar-nav-sublink')) {
-                        const parentLink = link.closest('.sidebar-nav-item').querySelector(
-                            '.sidebar-nav-link');
-                        if (parentLink) {
-                            parentLink.classList.add('active');
-                        }
-                    }
-                }
-            });
-
-            // WhatsApp button interaction
+            // WhatsApp button effect
             const whatsappButton = document.querySelector('.whatsapp-float');
-
             if (whatsappButton) {
-                // Add click animation
-                whatsappButton.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.9)';
+                whatsappButton.addEventListener('click', function(e) {
+                    this.style.animation = 'none';
                     setTimeout(() => {
-                        this.style.transform = 'scale(1.1)';
-                    }, 150);
+                        this.style.animation = 'pulse 2s infinite, float 3s ease-in-out infinite';
+                    }, 300);
                 });
             }
+
+            // Toastr notifications
+            @if (session('success'))
+                toastr.success('{{ session('success') }}', 'Sukses', {
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000,
+                    closeButton: true,
+                    progressBar: true,
+                    newestOnTop: true
+                });
+            @endif
+
+            @if (session('error'))
+                toastr.error('{{ session('error') }}', 'Error', {
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000,
+                    closeButton: true,
+                    progressBar: true,
+                    newestOnTop: true
+                });
+            @endif
+
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    toastr.error('{{ $error }}', 'Validation Error', {
+                        positionClass: 'toast-top-right',
+                        timeOut: 5000,
+                        closeButton: true,
+                        progressBar: true,
+                        newestOnTop: true
+                    });
+                @endforeach
+            @endif
+
+            // Logout confirmation
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    if (!confirm('Apakah Anda yakin ingin logout?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // User avatar hover effect
+            const userAvatar = document.querySelector('.user-avatar');
+            if (userAvatar) {
+                userAvatar.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1) rotate(5deg)';
+                });
+
+                userAvatar.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                });
+            }
+
+            // Animated counter for stats cards
+            function animateCounter(element, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const value = Math.floor(progress * (end - start) + start);
+
+                    // Format angka dengan titik pemisah ribuan
+                    element.textContent = value.toLocaleString('id-ID');
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // Initialize stats counters jika di dashboard
+            if (window.location.pathname === '/dashboard') {
+                // Contoh data - di production ini akan datang dari API
+                const statsData = {
+                    totalUmkm: 128,
+                    totalProduk: 542,
+                    pesananBaru: 24,
+                    penjualanBulanan: 12500000,
+                    userAktif: 48,
+                    rating: 4.7
+                };
+
+                // Animate counters
+                setTimeout(() => {
+                    if (document.getElementById('totalUmkm')) {
+                        animateCounter(document.getElementById('totalUmkm'), 0, statsData.totalUmkm, 2000);
+                    }
+                    if (document.getElementById('totalProduk')) {
+                        animateCounter(document.getElementById('totalProduk'), 0, statsData.totalProduk,
+                            2000);
+                    }
+                    if (document.getElementById('pesananBaru')) {
+                        animateCounter(document.getElementById('pesananBaru'), 0, statsData.pesananBaru,
+                            1500);
+                    }
+                    if (document.getElementById('penjualanBulanan')) {
+                        animateCounter(document.getElementById('penjualanBulanan'), 0, statsData
+                            .penjualanBulanan, 2500);
+                    }
+                    if (document.getElementById('userAktif')) {
+                        animateCounter(document.getElementById('userAktif'), 0, statsData.userAktif, 2000);
+                    }
+                    if (document.getElementById('rating')) {
+                        // Untuk rating, kita gunakan animasi yang berbeda
+                        let ratingElement = document.getElementById('rating');
+                        let currentRating = 0;
+                        const increment = statsData.rating / 50;
+                        const ratingInterval = setInterval(() => {
+                            currentRating += increment;
+                            ratingElement.textContent = currentRating.toFixed(1);
+                            if (currentRating >= statsData.rating) {
+                                ratingElement.textContent = statsData.rating.toFixed(1);
+                                clearInterval(ratingInterval);
+                            }
+                        }, 30);
+                    }
+                }, 500);
+            }
+
+            // Hover effect for stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Stat cards click effect
+            statCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'translateY(-2px) scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(-5px) scale(1.02)';
+                    }, 150);
+                });
+            });
         });
     </script>
     @yield('scripts')

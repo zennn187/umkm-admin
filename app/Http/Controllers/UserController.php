@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -15,7 +14,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('role', '!=', 'superadmin')->latest()->get();
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $users = User::latest()->paginate(10);
         return view('pages.users.index', compact('users'));
     }
 
@@ -24,6 +28,11 @@ class UserController extends Controller
      */
     public function create()
     {
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         return view('pages.users.create');
     }
 
@@ -32,21 +41,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:admin,user',
-            'phone' => 'nullable|string|max:15',
-            'alamat' => 'nullable|string|max:500',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,mitra,user', // Super Admin tidak bisa dibuat melalui form
         ]);
 
-        $photoName = null;
-        if ($request->hasFile('photo')) {
-            $photo = $request->file('photo');
-            $photoName = time() . '_' . $photo->getClientOriginalName();
-            $photo->storeAs('public/photos', $photoName);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         User::create([
@@ -54,22 +64,24 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-            'phone' => $request->phone,
-            'alamat' => $request->alamat,
-            'photo' => $photoName,
             'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('users.index')
-            ->with('success', 'User berhasil ditambahkan!');
+            ->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
-     * TAMBAHKAN/MODIFIKASI METHOD INI
      */
     public function show(User $user)
     {
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         return view('pages.users.show', compact('user'));
     }
 
@@ -78,6 +90,11 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         return view('pages.users.edit', compact('user'));
     }
 
@@ -86,42 +103,33 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,user',
-            'phone' => 'nullable|string|max:15',
-            'alamat' => 'nullable|string|max:500',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_active' => 'boolean'
+            'role' => 'required|in:super_admin,admin,mitra,user',
+            'is_active' => 'required|boolean',
         ]);
 
-        $data = [
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
-            'phone' => $request->phone,
-            'alamat' => $request->alamat,
-            'is_active' => $request->has('is_active'),
-        ];
-
-        // Handle upload foto
-        if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
-            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
-                Storage::delete('public/photos/' . $user->photo);
-            }
-
-            $photo = $request->file('photo');
-            $photoName = time() . '_' . $photo->getClientOriginalName();
-            $photo->storeAs('public/photos', $photoName);
-            $data['photo'] = $photoName;
-        }
-
-        $user->update($data);
+            'is_active' => $request->is_active,
+        ]);
 
         return redirect()->route('users.index')
-            ->with('success', 'User berhasil diupdate!');
+            ->with('success', 'User berhasil diperbarui.');
     }
 
     /**
@@ -129,38 +137,21 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Prevent deleting yourself
-        if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')
-                ->with('error', 'Tidak dapat menghapus akun sendiri!');
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
         }
 
-        // Hapus foto jika ada
-        if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
-            Storage::delete('public/photos/' . $user->photo);
+        // Cegah menghapus diri sendiri
+        if ($user->id === auth()->id()) {
+            return redirect()->route('users.index')
+                ->with('error', 'Anda tidak dapat menghapus akun sendiri.');
         }
 
         $user->delete();
 
         return redirect()->route('users.index')
-            ->with('success', 'User berhasil dihapus!');
-    }
-
-    /**
-     * Update user password
-     */
-    public function updatePassword(Request $request, User $user)
-    {
-        $request->validate([
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('users.index')
-            ->with('success', 'Password user berhasil diupdate!');
+            ->with('success', 'User berhasil dihapus.');
     }
 
     /**
@@ -168,12 +159,17 @@ class UserController extends Controller
      */
     public function toggleStatus(User $user)
     {
+        // Hanya Super Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
         $user->update([
             'is_active' => !$user->is_active
         ]);
 
         $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return redirect()->route('users.index')
-            ->with('success', "User berhasil $status!");
+            ->with('success', "User berhasil $status.");
     }
 }

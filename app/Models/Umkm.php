@@ -9,57 +9,50 @@ class Umkm extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'umkm_id';
     protected $table = 'umkm';
+    protected $primaryKey = 'umkm_id';
+    public $incrementing = true;
+    public $timestamps = true;
 
     protected $fillable = [
         'nama_usaha',
         'pemilik_warga_id',
-        'pemilik',
         'alamat',
         'rt',
         'rw',
         'kategori',
         'kontak',
         'deskripsi',
-        'status'
     ];
 
-    /**
-     * Relasi ke photos
-     */
-    public function photos()
+    // Relasi ke User (pemilik)
+    public function pemilik()
     {
-        return $this->hasMany(UmkmPhoto::class, 'umkm_id', 'umkm_id')->ordered();
+        return $this->belongsTo(User::class, 'pemilik_warga_id', 'id');
     }
 
-    /**
-     * Relasi ke photo utama
-     */
-    public function primaryPhoto()
+    // Relasi ke Media
+    public function media()
     {
-        return $this->hasOne(UmkmPhoto::class, 'umkm_id', 'umkm_id')->primary();
+        return $this->hasMany(Media::class, 'ref_id', 'umkm_id')
+                    ->where('ref_table', 'umkm');
     }
 
-    /**
-     * Accessor untuk foto utama
-     */
-    public function getPrimaryPhotoUrlAttribute()
+    // Accessor untuk nama pemilik
+    public function getNamaPemilikAttribute()
     {
-        $primaryPhoto = $this->primaryPhoto;
-        if ($primaryPhoto) {
-            return asset('storage/umkm-photos/' . $primaryPhoto->photo_path);
-        }
-
-        $firstPhoto = $this->photos->first();
-        return $firstPhoto ? $firstPhoto->photo_url : asset('images/default-umkm.jpg');
+        return $this->pemilik ? $this->pemilik->name : 'Tidak diketahui';
     }
 
-    /**
-     * Mutator untuk kategori
-     */
-    public function setKategoriAttribute($value)
+    // Scope untuk pencarian
+    public function scopeSearch($query, $search)
     {
-        $this->attributes['kategori'] = ucfirst($value);
+        return $query->where('nama_usaha', 'like', '%'.$search.'%')
+                    ->orWhere('alamat', 'like', '%'.$search.'%')
+                    ->orWhere('kategori', 'like', '%'.$search.'%')
+                    ->orWhere('kontak', 'like', '%'.$search.'%')
+                    ->orWhereHas('pemilik', function($q) use ($search) {
+                        $q->where('name', 'like', '%'.$search.'%');
+                    });
     }
 }

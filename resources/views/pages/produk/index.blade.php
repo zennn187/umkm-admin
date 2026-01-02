@@ -34,8 +34,21 @@
                 <div class="col-md-3">
                     <label for="search" class="form-label">Pencarian</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           placeholder="Cari nama produk, deskripsi, atau UMKM..."
+                           placeholder="Cari nama produk, jenis, deskripsi..."
                            value="{{ request('search') }}">
+                </div>
+
+                {{-- Filter Jenis Produk --}}
+                <div class="col-md-2">
+                    <label for="jenis_produk" class="form-label">Jenis Produk</label>
+                    <select class="form-select" id="jenis_produk" name="jenis_produk">
+                        <option value="">Semua Jenis</option>
+                        @foreach($jenisProduk as $jenis)
+                            <option value="{{ $jenis }}" {{ request('jenis_produk') == $jenis ? 'selected' : '' }}>
+                                {{ $jenis }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 {{-- Filter Status --}}
@@ -43,9 +56,8 @@
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
                         <option value="">Semua Status</option>
-                        <option value="Tersedia" {{ request('status') == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
-                        <option value="Habis" {{ request('status') == 'Habis' ? 'selected' : '' }}>Habis</option>
-                        <option value="Preorder" {{ request('status') == 'Preorder' ? 'selected' : '' }}>Preorder</option>
+                        <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="Nonaktif" {{ request('status') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                     </select>
                 </div>
 
@@ -59,16 +71,6 @@
                                 {{ $umkm->nama_usaha }}
                             </option>
                         @endforeach
-                    </select>
-                </div>
-
-                {{-- Filter Stok --}}
-                <div class="col-md-2">
-                    <label for="stok_filter" class="form-label">Stok</label>
-                    <select class="form-select" id="stok_filter" name="stok_filter">
-                        <option value="">Semua Stok</option>
-                        <option value="tersedia" {{ request('stok_filter') == 'tersedia' ? 'selected' : '' }}>Stok Tersedia</option>
-                        <option value="habis" {{ request('stok_filter') == 'habis' ? 'selected' : '' }}>Stok Habis</option>
                     </select>
                 </div>
 

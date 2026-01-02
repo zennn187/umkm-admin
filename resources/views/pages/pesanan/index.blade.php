@@ -89,6 +89,7 @@
                             <th>No</th>
                             <th>Nomor Pesanan</th>
                             <th>Customer</th>
+                            <th>UMKM</th>
                             <th>Total</th>
                             <th>Status</th>
                             <th>Alamat</th>
@@ -102,7 +103,8 @@
                         <tr>
                             <td>{{ $pesanans->firstItem() + $index }}</td>
                             <td>{{ $item->nomor_pesanan }}</td>
-                            <td>{{ $item->customer }}</td>
+                            <td>{{ $item->warga->nama ?? 'Tidak Diketahui' }}</td>
+                            <td>{{ $item->umkm->nama_umkm ?? '-' }}</td>
                             <td>Rp {{ number_format($item->total, 0, ',', '.') }}</td>
                             <td>
                                 <span class="badge

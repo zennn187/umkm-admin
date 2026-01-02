@@ -15,18 +15,33 @@ class Pesanan extends Model
     protected $fillable = [
         'nomor_pesanan',
         'warga_id',
-        'customer',
+        'umkm_id',        // sudah benar ada
         'total',
         'status',
         'alamat_kirim',
         'rt',
         'rw',
-        'metode_bayar'
+        'metode_bayar',
+        'bukti_bayar'     // sudah ada (perbaiki typo jika perlu)
     ];
 
     protected $casts = [
-        'total' => 'decimal:2'
+        'total' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
+
+    // Relasi ke Warga
+    public function warga()
+    {
+        return $this->belongsTo(Warga::class, 'warga_id', 'warga_id');
+    }
+
+    // Relasi ke UMKM
+    public function umkm()
+    {
+        return $this->belongsTo(Umkm::class, 'umkm_id', 'umkm_id');
+    }
 
     // Method untuk generate nomor pesanan
     public static function generateNomorPesanan()
@@ -43,5 +58,11 @@ class Pesanan extends Model
         }
 
         return $prefix . $date . $newNumber;
+    }
+
+    // Accessor untuk nama customer
+    public function getCustomerNameAttribute()
+    {
+        return $this->warga ? $this->warga->nama : 'Tidak Diketahui';
     }
 }
