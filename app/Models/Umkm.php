@@ -16,7 +16,7 @@ class Umkm extends Model
 
     protected $fillable = [
         'nama_usaha',
-        'pemilik_warga_id',
+        'pemilik_warga_id', // HARUSNYA relasi ke Warga, bukan User
         'alamat',
         'rt',
         'rw',
@@ -25,10 +25,10 @@ class Umkm extends Model
         'deskripsi',
     ];
 
-    // Relasi ke User (pemilik)
-    public function pemilik()
+    // ⚠️ PERBAIKI: Relasi ke Warga (bukan User)
+    public function warga()
     {
-        return $this->belongsTo(User::class, 'pemilik_warga_id', 'id');
+        return $this->belongsTo(Warga::class, 'pemilik_warga_id', 'warga_id');
     }
 
     // Relasi ke Media
@@ -38,10 +38,28 @@ class Umkm extends Model
                     ->where('ref_table', 'umkm');
     }
 
+    // Relasi ke Produk
+    public function produk()
+    {
+        return $this->hasMany(Produk::class, 'umkm_id', 'umkm_id');
+    }
+
+    // Relasi ke Pesanan
+    public function pesanan()
+    {
+        return $this->hasMany(Pesanan::class, 'umkm_id', 'umkm_id');
+    }
+
     // Accessor untuk nama pemilik
     public function getNamaPemilikAttribute()
     {
-        return $this->pemilik ? $this->pemilik->name : 'Tidak diketahui';
+        return $this->warga ? $this->warga->name : 'Tidak diketahui'; // warga->name bukan pemilik->name
+    }
+
+    // Accessor untuk nomor telepon pemilik
+    public function getTelpPemilikAttribute()
+    {
+        return $this->warga ? $this->warga->telp : '-';
     }
 
     // Scope untuk pencarian
@@ -51,7 +69,7 @@ class Umkm extends Model
                     ->orWhere('alamat', 'like', '%'.$search.'%')
                     ->orWhere('kategori', 'like', '%'.$search.'%')
                     ->orWhere('kontak', 'like', '%'.$search.'%')
-                    ->orWhereHas('pemilik', function($q) use ($search) {
+                    ->orWhereHas('warga', function($q) use ($search) { // PERBAIKI: warga bukan pemilik
                         $q->where('name', 'like', '%'.$search.'%');
                     });
     }

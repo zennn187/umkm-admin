@@ -753,13 +753,7 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-nav-section">LAPORAN</li>
-                    <li class="sidebar-nav-item">
-                        <a href="{{ route('laporan.penjualan') }}"
-                            class="sidebar-nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
-                            <i class="fas fa-chart-line"></i> Laporan
-                        </a>
-                    </li>
+
                 @endif
 
                 @if (auth()->user()->role === 'super_admin' || auth()->user()->role === 'admin')
@@ -778,7 +772,6 @@
                     </li>
                 @endif
 
-                <li class="sidebar-nav-section">SETTING</li>
                 <li class="sidebar-nav-item">
                     <a href="{{ route('profile.edit') }}"
                         class="sidebar-nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
@@ -881,78 +874,7 @@
 
         <!-- Page Content -->
         <div class="content-container">
-            <!-- Stats Cards Section - DITAMBAHKAN -->
-            @if (request()->is('dashboard'))
-                <div class="stats-grid">
-                    <div class="stat-card total-umkm">
-                        <div class="stat-icon">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <div class="stat-value" id="totalUmkm">0</div>
-                        <div class="stat-label">Total UMKM</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> 12% dari bulan lalu
-                        </div>
-                    </div>
 
-                    <div class="stat-card total-produk">
-                        <div class="stat-icon">
-                            <i class="fas fa-box-open"></i>
-                        </div>
-                        <div class="stat-value" id="totalProduk">0</div>
-                        <div class="stat-label">Produk Terdaftar</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> 8% dari bulan lalu
-                        </div>
-                    </div>
-
-                    <div class="stat-card pesanan-baru">
-                        <div class="stat-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="stat-value" id="pesananBaru">0</div>
-                        <div class="stat-label">Pesanan Baru</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> 15% dari kemarin
-                        </div>
-                    </div>
-
-                    <div class="stat-card penjualan-bulanan">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-value">Rp <span id="penjualanBulanan">0</span></div>
-                        <div class="stat-label">Penjualan Bulanan</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> 20% dari bulan lalu
-                        </div>
-                    </div>
-
-                    @if (auth()->user()->role === 'super_admin')
-                        <div class="stat-card user-aktif">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-value" id="userAktif">0</div>
-                            <div class="stat-label">User Aktif</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i> 5% dari bulan lalu
-                            </div>
-                        </div>
-
-                        <div class="stat-card rating">
-                            <div class="stat-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="stat-value" id="rating">0</div>
-                            <div class="stat-label">Rating Rata-rata</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i> 0.2 dari bulan lalu
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            @endif
 
             @yield('content')
         </div>

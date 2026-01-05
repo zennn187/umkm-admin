@@ -64,71 +64,87 @@ Route::middleware(['auth'])->group(function () {
     // Produk Routes (bisa diakses semua user yang login)
     Route::resource('produk', ProdukController::class);
 
-    // Pesanan Routes
+    // Route untuk pesanan
     Route::prefix('pesanan')->name('pesanan.')->group(function () {
+        // Resource routes
         Route::get('/', [PesananController::class, 'index'])->name('index');
-        Route::get('/baru', [PesananController::class, 'baru'])->name('baru');
-        Route::get('/diproses', [PesananController::class, 'diproses'])->name('diproses');
-        Route::get('/selesai', [PesananController::class, 'selesai'])->name('selesai');
+        Route::get('/create', [PesananController::class, 'create'])->name('create');
+        Route::post('/', [PesananController::class, 'store'])->name('store');
         Route::get('/{pesanan}', [PesananController::class, 'show'])->name('show');
-        Route::put('/{pesanan}/status', [PesananController::class, 'updateStatus'])->name('updateStatus');
+        Route::get('/{pesanan}/edit', [PesananController::class, 'edit'])->name('edit');
+        Route::put('/{pesanan}', [PesananController::class, 'update'])->name('update');
+        Route::delete('/{pesanan}', [PesananController::class, 'destroy'])->name('destroy');
+
+        // Route khusus untuk update status
+        Route::patch('/pesanan/{pesanan}/update-status', [PesananController::class, 'updateStatus'])
+            ->name('pesanan.update.status');
+
+// Route khusus untuk upload bukti bayar
+        Route::post('/pesanan/{pesanan}/upload-bukti', [PesananController::class, 'uploadBuktiBayar'])
+            ->name('pesanan.upload.bukti');
+
+// Route untuk filter status
+        Route::get('/pesanan/status/baru', [PesananController::class, 'baru'])->name('pesanan.baru');
+        Route::get('/pesanan/status/diproses', [PesananController::class, 'diproses'])->name('pesanan.diproses');
+        Route::get('/pesanan/status/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
+        Route::get('/pesanan/{pesanan}/delete', [PesananController::class, 'delete'])
+    ->name('pesanan.delete');
     });
+        // ========== ROUTES BERDASARKAN ROLE ==========
 
-    // ========== ROUTES BERDASARKAN ROLE ==========
+        // Routes untuk Super Admin SAJA
+        Route::middleware(['checkrole:super_admin'])->group(function () {
+            // User Management (hanya Super Admin)
+            Route::resource('users', UserController::class);
+            Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
-    // Routes untuk Super Admin SAJA
-    Route::middleware(['checkrole:super_admin'])->group(function () {
-        // User Management (hanya Super Admin)
-        Route::resource('users', UserController::class);
-        Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+            // System Logs (hanya Super Admin)
+            Route::get('/system/logs', function () {
+                return view('pages.system.logs');
+            })->name('system.logs');
 
-        // System Logs (hanya Super Admin)
-        Route::get('/system/logs', function () {
-            return view('pages.system.logs');
-        })->name('system.logs');
-
-        // Warga (hanya Super Admin)
-        Route::resource('warga', WargaController::class);
-    });
-
-    // Routes untuk Super Admin dan Admin
-    Route::middleware(['checkrole:super_admin,admin'])->group(function () {
-        // Laporan Routes
-        Route::prefix('laporan')->name('laporan.')->group(function () {
-            Route::get('/penjualan', [LaporanController::class, 'penjualan'])->name('penjualan');
-            Route::get('/produk', [LaporanController::class, 'produk'])->name('produk');
-            Route::get('/umkm', [LaporanController::class, 'umkm'])->name('umkm');
+            // Warga (hanya Super Admin)
+            Route::resource('warga', WargaController::class);
         });
 
-        // Pengaturan (Super Admin & Admin)
-        Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+        // Routes untuk Super Admin dan Admin
+        Route::middleware(['checkrole:super_admin,admin'])->group(function () {
+            // Laporan Routes
+            Route::prefix('laporan')->name('laporan.')->group(function () {
+                Route::get('/penjualan', [LaporanController::class, 'penjualan'])->name('penjualan');
+                Route::get('/produk', [LaporanController::class, 'produk'])->name('produk');
+                Route::get('/umkm', [LaporanController::class, 'umkm'])->name('umkm');
+            });
 
-        // Pembayaran (Super Admin & Admin)
-        Route::get('/pembayaran', [PesananController::class, 'pembayaran'])->name('pembayaran.index');
-    });
+            // Pengaturan (Super Admin & Admin)
+            Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
 
-    // Routes untuk Mitra saja
-    Route::middleware(['checkrole:mitra'])->group(function () {
-        Route::get('/mitra/dashboard', [DashboardController::class, 'mitraDashboard'])->name('mitra.dashboard');
+            // Pembayaran (Super Admin & Admin)
+            Route::get('/pembayaran', [PesananController::class, 'pembayaran'])->name('pembayaran.index');
+        });
+
+        // Routes untuk Mitra saja
+        Route::middleware(['checkrole:mitra'])->group(function () {
+            Route::get('/mitra/dashboard', [DashboardController::class, 'mitraDashboard'])->name('mitra.dashboard');
+        });
     });
-});
 
 // ==================== HELPER FUNCTIONS ====================
-if (! function_exists('formatBytes')) {
-    function formatBytes($bytes, $decimals = 2)
-    {
-        $size   = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
+    if (! function_exists('formatBytes')) {
+        function formatBytes($bytes, $decimals = 2)
+        {
+            $size   = ['B', 'KB', 'MB', 'GB', 'TB'];
+            $factor = floor((strlen($bytes) - 1) / 3);
 
-        if ($bytes == 0) {
-            return '0 B';
+            if ($bytes == 0) {
+                return '0 B';
+            }
+
+            return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . $size[$factor];
         }
-
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . $size[$factor];
     }
-}
 
 // ==================== FALLBACK ROUTE ====================
-Route::fallback(function () {
-    return redirect()->route('dashboard');
-});
+    Route::fallback(function () {
+        return redirect()->route('dashboard');
+    });

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('umkm', function (Blueprint $table) {
     $table->id('umkm_id'); // otomatis bigint unsigned auto_increment
-    $table->string('name_usaha');
+    $table->string('nama_usaha');
     $table->unsignedInteger('pemilik_warga_id'); // HAPUS auto_increment dari sini
     $table->text('alamat');
     $table->string('rt', 3);
