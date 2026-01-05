@@ -16,7 +16,7 @@ class Umkm extends Model
 
     protected $fillable = [
         'nama_usaha',
-        'pemilik_warga_id', // HARUSNYA relasi ke Warga, bukan User
+        'pemilik_warga_id',
         'alamat',
         'rt',
         'rw',
@@ -25,8 +25,13 @@ class Umkm extends Model
         'deskripsi',
     ];
 
-    // ⚠️ PERBAIKI: Relasi ke Warga (bukan User)
-    public function warga()
+    public function user()
+    {
+        // Sesuaikan foreign key dan local key
+        return $this->belongsTo(User::class, 'pemilik_warga_id', 'id');
+    }
+    // ⚠️ TAMBAHKAN: Relasi alias 'pemiliki' untuk kompatibilitas
+    public function pemiliki()
     {
         return $this->belongsTo(Warga::class, 'pemilik_warga_id', 'warga_id');
     }
@@ -53,7 +58,7 @@ class Umkm extends Model
     // Accessor untuk nama pemilik
     public function getNamaPemilikAttribute()
     {
-        return $this->warga ? $this->warga->name : 'Tidak diketahui'; // warga->name bukan pemilik->name
+        return $this->warga ? $this->warga->name : 'Tidak diketahui';
     }
 
     // Accessor untuk nomor telepon pemilik
@@ -69,7 +74,7 @@ class Umkm extends Model
                     ->orWhere('alamat', 'like', '%'.$search.'%')
                     ->orWhere('kategori', 'like', '%'.$search.'%')
                     ->orWhere('kontak', 'like', '%'.$search.'%')
-                    ->orWhereHas('warga', function($q) use ($search) { // PERBAIKI: warga bukan pemilik
+                    ->orWhereHas('warga', function($q) use ($search) {
                         $q->where('name', 'like', '%'.$search.'%');
                     });
     }

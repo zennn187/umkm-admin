@@ -196,12 +196,15 @@
             animation: fadeIn 0.8s ease-out;
         }
 
-        /* Main Content dengan animasi masuk */
+        /* Main Content dengan animasi masuk - PERBAIKAN: overflow visible */
         .main-content {
             margin-left: 280px;
-            min-height: 100vh;
+            min-height: calc(100vh - 200px);
+            /* KURANGI TINGGI UNTUK RUANG FOOTER */
             transition: all 0.3s;
             animation: fadeInUp 0.8s ease-out 0.3s both;
+            position: relative;
+            z-index: 1;
         }
 
         .navbar-main {
@@ -211,14 +214,19 @@
             animation: slideDown 0.5s ease-out;
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1050;
+            /* PERBAIKAN: z-index untuk navbar */
         }
 
         .content-container {
             padding: 2rem;
             animation: fadeIn 0.8s ease-out 0.5s both;
+            min-height: calc(100vh - 250px);
+            /* SESUAIKAN DENGAN FOOTER */
         }
 
-        /* User Dropdown Styles - DIPERBAIKI */
+        /* User Dropdown Styles - PERBAIKAN UTAMA */
         .user-info {
             display: flex;
             align-items: center;
@@ -271,61 +279,85 @@
             color: #6c757d;
         }
 
-        .user-dropdown .dropdown-toggle::after {
-            display: none;
+        /* PERBAIKAN PENTING: Dropdown styling */
+        .user-dropdown {
+            position: static !important;
+            /* PERUBAHAN PENTING */
+        }
+
+        .user-dropdown .dropdown-toggle {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .user-dropdown .dropdown-toggle:focus {
+            box-shadow: none !important;
         }
 
         .user-dropdown .dropdown-menu {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 0.5rem 0;
-            margin-top: 10px;
-            animation: slideInDown 0.3s ease;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 200px;
+            border: none !important;
+            border-radius: 15px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+            padding: 0.5rem 0 !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            min-width: 220px !important;
+            position: absolute !important;
+            z-index: 9999 !important;
+            /* PERBAIKAN: z-index tinggi */
+            transform: translate3d(0px, 45px, 0px) !important;
         }
 
+        /* PERBAIKAN: Dropdown item styling */
         .user-dropdown .dropdown-item {
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            margin: 0 5px;
-            color: var(--dark-color);
-            display: flex;
-            align-items: center;
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+            border-radius: 8px !important;
+            margin: 2px 8px !important;
+            color: var(--dark-color) !important;
+            display: flex !important;
+            align-items: center !important;
+            cursor: pointer !important;
         }
 
         .user-dropdown .dropdown-item:hover {
-            background: var(--purple-gradient);
-            color: white;
-            transform: translateX(5px);
+            background: var(--purple-gradient) !important;
+            color: white !important;
+            transform: translateX(5px) !important;
         }
 
         .user-dropdown .dropdown-item i {
-            width: 20px;
-            margin-right: 10px;
-            font-size: 14px;
+            width: 20px !important;
+            margin-right: 10px !important;
+            font-size: 14px !important;
         }
 
         .user-dropdown .dropdown-divider {
-            margin: 0.5rem 0;
-            opacity: 0.2;
+            margin: 0.5rem 0 !important;
+            opacity: 0.2 !important;
         }
 
         .user-dropdown .dropdown-item.logout-item {
-            color: #ef4444;
+            color: #ef4444 !important;
         }
 
         .user-dropdown .dropdown-item.logout-item:hover {
-            background: var(--red-gradient);
-            color: white;
+            background: var(--red-gradient) !important;
+            color: white !important;
         }
 
-        /* Stats Cards - DITAMBAHKAN */
+        /* Dropdown header */
+        .user-dropdown .dropdown-header {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.85rem !important;
+            color: var(--dark-color) !important;
+            white-space: normal !important;
+        }
+
+        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -685,20 +717,115 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            /* PERBAIKAN: Dropdown di mobile */
+            .user-dropdown .dropdown-menu {
+                position: fixed !important;
+                right: 10px !important;
+                left: auto !important;
+                width: 200px !important;
+                z-index: 9999 !important;
+            }
+        }
+
+        /* ========== FOOTER DENGAN PURPLE GRADIENT SAJA ========== */
+        .footer {
+            background: var(--purple-gradient) !important;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            width: 100%;
+            transition: all 0.3s ease;
+            z-index: 100;
+            margin-left: 280px;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Efek hover untuk footer */
+        .footer-icon .icon-wrapper {
+            transition: all 0.3s ease;
+        }
+
+        .footer-icon:hover .icon-wrapper {
+            transform: rotate(5deg) scale(1.05);
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .badge-umkm .badge {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-umkm:hover .badge {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-item {
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-item:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Responsive untuk footer */
+        @media (max-width: 768px) {
+            .footer {
+                margin-left: 0 !important;
+                padding: 1.5rem 0 !important;
+            }
+
+            .footer .row {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer .text-md-start,
+            .footer .text-md-end {
+                text-align: center !important;
+            }
         }
 
         @media (max-width: 480px) {
-            .whatsapp-float {
-                width: 45px;
-                height: 45px;
-                bottom: 15px;
-                right: 15px;
-                font-size: 20px;
+            .footer {
+                padding: 1.25rem 0 !important;
             }
+        }
 
-            .content-container {
-                padding: 1rem;
-            }
+        .content-container {
+            padding: 1rem;
+        }
+
+        .user-dropdown .dropdown-menu {
+            width: 180px !important;
+            right: 5px !important;
+        }
+
+        /* PERBAIKAN TAMBAHAN: Pastikan dropdown bisa keluar dari container */
+        .navbar-main {
+            overflow: visible !important;
+        }
+
+        .dropdown-menu {
+            z-index: 9999 !important;
         }
     </style>
     @yield('styles')
@@ -709,7 +836,7 @@
     <div class="sidebar">
         <div class="sidebar-brand">
             <h4 class="mb-0">
-                <i class="fas fa-store"></i> UMKM MAKANAN
+                <i class="fas fa-store"></i> UMKM
             </h4>
             <small class="opacity-75">Sistem Manajemen Usaha</small>
         </div>
@@ -752,12 +879,10 @@
                             <i class="fas fa-shopping-cart"></i> Data Pesanan
                         </a>
                     </li>
-
-
                 @endif
 
                 @if (auth()->user()->role === 'super_admin' || auth()->user()->role === 'admin')
-                    <li class="sidebar-nav-section">ADMINISTRASI</li>
+                    <li class="sidebar-nav-section">Pengaturan</li>
                     <li class="sidebar-nav-item">
                         <a href="{{ route('users.index') }}"
                             class="sidebar-nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
@@ -770,20 +895,16 @@
                             <i class="fas fa-users"></i> Data Warga
                         </a>
                     </li>
+                    <li class="sidebar-nav-item">
+                        <a href="{{ route('identitas') }}"
+                            class="sidebar-nav-link {{ request()->routeIs('identitas') ? 'active' : '' }}">
+                            <i class="fas fa-users"></i> Identitas
+                        </a>
+                    </li>
                 @endif
 
-                <li class="sidebar-nav-item">
-                    <a href="{{ route('profile.edit') }}"
-                        class="sidebar-nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-                        <i class="fas fa-user-cog"></i> Profile
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{{ route('pengaturan') }}"
-                        class="sidebar-nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
-                        <i class="fas fa-cog"></i> Pengaturan
-                    </a>
-                </li>
+
+
             @endauth
         </ul>
     </div>
@@ -804,9 +925,10 @@
                     </div>
 
                     <div class="d-flex align-items-center">
+                        <!-- PERBAIKAN: Dropdown yang lebih sederhana -->
                         <div class="dropdown user-dropdown">
-                            <button class="btn btn-link p-0" type="button" id="userDropdown" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <button class="btn btn-link p-0 dropdown-toggle" type="button" id="userDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="user-info">
                                     <div class="user-avatar">
                                         {{ substr(Auth::check() ? Auth::user()->name : 'G', 0, 1) }}
@@ -824,21 +946,22 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 @auth
                                     <li>
-                                        <span class="dropdown-header">
+                                        <div class="dropdown-header">
                                             <strong>{{ Auth::user()->name }}</strong><br>
                                             <small class="text-muted">{{ Auth::user()->email }}</small>
-                                        </span>
+                                        </div>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                        <i class="fas fa-user-circle"></i> Profile Saya
-                                    </a>
-
                                     <li>
                                         <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                            <i class="fas fa-edit"></i> Edit Profile
+                                            <i class="fas fa-user-circle me-2"></i> Profile Saya
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                            <i class="fas fa-edit me-2"></i> Edit Profile
                                         </a>
                                     </li>
                                     <li>
@@ -849,19 +972,19 @@
                                             @csrf
                                             <a class="dropdown-item logout-item" href="#"
                                                 onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
-                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                                <i class="fas fa-sign-out-alt me-2"></i> Logout
                                             </a>
                                         </form>
                                     </li>
                                 @else
                                     <li>
                                         <a class="dropdown-item" href="{{ route('login') }}">
-                                            <i class="fas fa-sign-in-alt"></i> Login
+                                            <i class="fas fa-sign-in-alt me-2"></i> Login
                                         </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('register') }}">
-                                            <i class="fas fa-user-plus"></i> Register
+                                            <i class="fas fa-user-plus me-2"></i> Register
                                         </a>
                                     </li>
                                 @endauth
@@ -874,11 +997,56 @@
 
         <!-- Page Content -->
         <div class="content-container">
-
-
             @yield('content')
         </div>
+    </div> <!-- TUTUP .main-content -->
+
+    <!-- Footer dengan Purple Gradient -->
+<footer class="footer py-3 text-white">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <!-- Bagian Kiri - sekarang center -->
+            <div class="col-md-6 text-center mb-3 mb-md-0">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="footer-icon me-3">
+                        <div class="icon-wrapper bg-white bg-opacity-10 p-2 rounded-circle">
+                            <i class="fas fa-store fa-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 fs-6">Sistem UMKM Digital</h5> <!-- Tambah fs-6 -->
+                        <small class="opacity-75 fs-6">Ekosistem UMKM Modern</small> <!-- Tambah fs-7 -->
+                    </div>
+                </div>
+                <!-- Garis Pemisah -->
+                <hr class="my-3 opacity-25">
+                <p class="mb-0 opacity-75 small fs-7"> <!-- Tambah fs-7 -->
+                    Platform terintegrasi untuk pengelolaan Usaha Mikro, Kecil dan Menengah
+                </p>
+            </div>
+
+            <!-- Bagian Kanan - sekarang center juga -->
+            <div class="col-md-6 text-center">
+                <div class="d-flex flex-column align-items-center gap-2">
+                    <!-- Copyright -->
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-copyright me-2 opacity-75 fs-6"></i> <!-- Tambah fs-7 -->
+                        <span class="opacity-75 fs-7">{{ date('Y') }} - Hak Cipta Dilindungi</span> <!-- Tambah fs-7 -->
+                    </div>
+
+                    <!-- Badge -->
+                    <div class="badge-umkm">
+                        <span class="badge px-3 py-2 rounded-pill bg-white bg-opacity-10 border border-white border-opacity-25 fs-6"> <!-- Tambah fs-7 -->
+                            <i class="fas fa-heart text-pink me-1"></i>
+                            Dibuat dengan Citra UMKM
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fitur Sistem -->
     </div>
+</footer>
 
     <!-- Floating WhatsApp Button -->
     <a href="https://wa.me/6289505647628?text=Halo,%20saya%20membutuhkan%20informasi%20tentang%20UMKM%20Anda"
@@ -905,10 +1073,39 @@
                 sidebar.classList.toggle('active');
             });
 
-            // Initialize Bootstrap dropdowns
-            const dropdownElements = document.querySelectorAll('.dropdown-toggle');
-            dropdownElements.forEach(el => {
-                new bootstrap.Dropdown(el);
+            // PERBAIKAN SEDERHANA: Inisialisasi dropdown Bootstrap
+            const userDropdown = new bootstrap.Dropdown(document.getElementById('userDropdown'));
+
+            // Ensure dropdown is properly initialized
+            document.getElementById('userDropdown')?.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event bubbling
+            });
+
+            // Fix untuk memastikan dropdown bisa diklik
+            document.querySelectorAll('.user-dropdown .dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Jika ada form logout, biarkan event propagation
+                    if (this.classList.contains('logout-item')) {
+                        e.preventDefault();
+                        if (confirm('Apakah Anda yakin ingin logout?')) {
+                            document.getElementById('logoutForm').submit();
+                        }
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside - PERBAIKAN
+            document.addEventListener('click', function(e) {
+                const dropdown = document.querySelector('.user-dropdown');
+                const dropdownMenu = document.querySelector('.user-dropdown .dropdown-menu');
+
+                if (!dropdown.contains(e.target) && dropdownMenu.classList.contains('show')) {
+                    const dropdownInstance = bootstrap.Dropdown.getInstance(document.getElementById(
+                        'userDropdown'));
+                    if (dropdownInstance) {
+                        dropdownInstance.hide();
+                    }
+                }
             });
 
             // Auto-hide alerts
@@ -963,16 +1160,6 @@
                     });
                 @endforeach
             @endif
-
-            // Logout confirmation
-            const logoutForm = document.getElementById('logoutForm');
-            if (logoutForm) {
-                logoutForm.addEventListener('submit', function(e) {
-                    if (!confirm('Apakah Anda yakin ingin logout?')) {
-                        e.preventDefault();
-                    }
-                });
-            }
 
             // User avatar hover effect
             const userAvatar = document.querySelector('.user-avatar');

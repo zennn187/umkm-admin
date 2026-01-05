@@ -1,23 +1,25 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\PengaturanController;
-use App\Http\Controllers\PesananController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\WargaController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\UlasanProdukController;
 
-// ==================== ROUTE PUBLIC ====================
+//  ROUTE PUBLIC
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
 
-// ==================== AUTH ROUTES ====================
+//  AUTH ROUTES
 Route::middleware('guest')->group(function () {
     // Login Routes
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -34,7 +36,7 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
-// ==================== PROTECTED ROUTES (BUTUH LOGIN) ====================
+//  PROTECTED ROUTES (BUTUH LOGIN)
 Route::middleware(['auth'])->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -56,14 +58,34 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update-order', [MediaController::class, 'updateOrder'])->name('media.update-order');
     });
 
-    // ========== ROUTES UNTUK SEMUA USER YANG LOGIN ==========
+    //  ROUTES UNTUK SEMUA USER YANG LOGIN
 
     // UMKM Routes (bisa diakses semua user yang login)
     Route::resource('umkm', UmkmController::class);
 
     // Produk Routes (bisa diakses semua user yang login)
     Route::resource('produk', ProdukController::class);
+// ULASAN PRODUK ROUTES
+Route::prefix('ulasan-produk')->name('ulasan-produk.')->group(function () {
+    Route::get('/', [UlasanProdukController::class, 'index'])->name('index');
+    Route::get('/create', [UlasanProdukController::class, 'create'])->name('create');
+    Route::post('/', [UlasanProdukController::class, 'store'])->name('store');
+    Route::get('/{id}', [UlasanProdukController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [UlasanProdukController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [UlasanProdukController::class, 'update'])->name('update');
+    Route::delete('/{id}', [UlasanProdukController::class, 'destroy'])->name('destroy');
 
+    // TAMBAHAN ROUTES
+    Route::post('/{id}/toggle-verification', [UlasanProdukController::class, 'toggleVerification'])->name('toggle-verification');
+    Route::post('/{id}/toggle-visibility', [UlasanProdukController::class, 'toggleVisibility'])->name('toggle-visibility');
+    Route::get('/produk/{produkId}', [UlasanProdukController::class, 'byProduk'])->name('by-produk');
+    Route::get('/export', [UlasanProdukController::class, 'export'])->name('export');
+    Route::post('/bulk-delete', [UlasanProdukController::class, 'bulkDelete'])->name('bulk-delete');
+    Route::post('/bulk-verify', [UlasanProdukController::class, 'bulkVerify'])->name('bulk-verify');
+});
+
+// ATAU JIKA MAU PAKAI RESOURCE (lebih sederhana)
+Route::resource('ulasan-produk', UlasanProdukController::class);
     // Route untuk pesanan
     Route::prefix('pesanan')->name('pesanan.')->group(function () {
         // Resource routes
@@ -90,7 +112,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pesanan/{pesanan}/delete', [PesananController::class, 'delete'])
     ->name('pesanan.delete');
     });
-        // ========== ROUTES BERDASARKAN ROLE ==========
+        // ROUTES BERDASARKAN ROLE
 
         // Routes untuk Super Admin SAJA
         Route::middleware(['checkrole:super_admin'])->group(function () {
@@ -129,7 +151,11 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-// ==================== HELPER FUNCTIONS ====================
+Route::get('/developer', function () {
+    return view('identitas');
+})->name('identitas');
+
+//  HELPER FUNCTIONS
     if (! function_exists('formatBytes')) {
         function formatBytes($bytes, $decimals = 2)
         {
@@ -144,7 +170,7 @@ Route::middleware(['auth'])->group(function () {
         }
     }
 
-// ==================== FALLBACK ROUTE ====================
+//  FALLBACK ROUTE
     Route::fallback(function () {
         return redirect()->route('dashboard');
     });

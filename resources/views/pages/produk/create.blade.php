@@ -68,19 +68,22 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-    <div class="mb-3">
-        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-        <select class="form-control @error('status') is-invalid @enderror"
-                id="status" name="status" required>
-            <option value="">Pilih Status</option>
-            <option value="Aktif" {{ old('status', $produk->status ?? '') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-            <option value="Nonaktif" {{ old('status', $produk->status ?? '') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-        </select>
-        @error('status')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
+                                required>
+                                <option value="">Pilih Status</option>
+                                <option value="Aktif"
+                                    {{ old('status', $produk->status ?? '') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="Nonaktif"
+                                    {{ old('status', $produk->status ?? '') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif
+                                </option>
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between">

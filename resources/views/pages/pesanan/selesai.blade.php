@@ -18,7 +18,7 @@
                             <table class="table table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>No</th>
                                         <th>Kode Pesanan</th>
                                         <th>Nama Customer</th>
                                         <th>Total</th>

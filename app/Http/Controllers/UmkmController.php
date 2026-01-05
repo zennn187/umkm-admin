@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Umkm;
+use App\Models\Warga;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class UmkmController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Umkm::with(['pemilik', 'media'])
+        $query = Umkm::with('media')
                     ->withCount('media');
 
         // Search
@@ -27,8 +28,11 @@ class UmkmController extends Controller
                   ->orWhere('alamat', 'like', "%{$search}%")
                   ->orWhere('kategori', 'like', "%{$search}%")
                   ->orWhere('kontak', 'like', "%{$search}%")
-                  ->orWhereHas('pemilik', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
+                  ->orWhereExists(function ($subQuery) use ($search) {
+                      $subQuery->select(DB::raw(1))
+                              ->from('warga')
+                              ->whereColumn('warga.warga_id', 'umkm.pemilik_warga_id')
+                              ->where('warga.name', 'like', "%{$search}%");
                   });
             });
         }
@@ -46,10 +50,6 @@ class UmkmController extends Controller
             $query->where('rw', $request->rw);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
         // Sorting
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
@@ -57,6 +57,15 @@ class UmkmController extends Controller
 
         $umkms = $query->paginate($request->get('per_page', 10))
                       ->withQueryString();
+
+        // Ambil data warga untuk semua umkm di halaman ini
+        $wargaIds = $umkms->pluck('pemilik_warga_id')->unique()->toArray();
+        $wargas = Warga::whereIn('warga_id', $wargaIds)->get()->keyBy('warga_id');
+
+        // Tambahkan data warga ke setiap umkm
+        $umkms->each(function ($umkm) use ($wargas) {
+            $umkm->warga_data = $wargas[$umkm->pemilik_warga_id] ?? null;
+        });
 
         $kategories = Umkm::select('kategori')
                          ->whereNotNull('kategori')
@@ -76,7 +85,7 @@ class UmkmController extends Controller
                       ->pluck('rw')
                       ->sort();
 
-return view('pages.umkm.index', compact('umkms', 'kategories', 'rtList', 'rwList'));
+        return view('pages.umkm.index', compact('umkms', 'kategories', 'rtList', 'rwList'));
     }
 
     /**
@@ -84,10 +93,7 @@ return view('pages.umkm.index', compact('umkms', 'kategories', 'rtList', 'rwList
      */
     public function create()
     {
-        $users = \App\Models\User::where('role', 'mitra')
-                                ->orWhere('role', 'warga')
-                                ->orderBy('name')
-                                ->get();
+        $wargas = Warga::orderBy('name')->get();
 
         $kategories = config('umkm.kategori', [
             'Makanan & Minuman',
@@ -99,7 +105,7 @@ return view('pages.umkm.index', compact('umkms', 'kategories', 'rtList', 'rwList
             'Lainnya'
         ]);
 
-return view('pages.umkm.create', compact('users', 'kategories'));
+        return view('pages.umkm.create', compact('wargas', 'kategories'));
     }
 
     /**
@@ -109,7 +115,7 @@ return view('pages.umkm.create', compact('users', 'kategories'));
     {
         $validated = $request->validate([
             'nama_usaha' => 'required|string|max:255',
-            'pemilik_warga_id' => 'required|integer|exists:users,id',
+            'pemilik_warga_id' => 'required|integer|exists:warga,warga_id',
             'alamat' => 'required|string|max:500',
             'rt' => 'required|string|max:3',
             'rw' => 'required|string|max:3',
@@ -118,7 +124,6 @@ return view('pages.umkm.create', compact('users', 'kategories'));
             'deskripsi' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'status' => 'nullable|in:aktif,nonaktif,pending',
             'files.*' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx',
             'captions.*' => 'nullable|string|max:255',
             'featured_image' => 'nullable|integer',
@@ -128,9 +133,7 @@ return view('pages.umkm.create', compact('users', 'kategories'));
 
         try {
             // Create UMKM
-            $umkm = Umkm::create(array_merge($validated, [
-                'status' => $validated['status'] ?? 'aktif',
-            ]));
+            $umkm = Umkm::create($validated);
 
             // Handle file uploads
             if ($request->hasFile('files')) {
@@ -191,16 +194,19 @@ return view('pages.umkm.create', compact('users', 'kategories'));
      */
     public function show(Umkm $umkm)
     {
-        $umkm->load(['pemilik', 'media' => function($query) {
+        $umkm->load(['media' => function($query) {
             $query->orderBy('is_featured', 'desc')
                   ->orderBy('order')
                   ->orderBy('created_at', 'desc');
         }]);
 
+        // Ambil data warga terkait
+        $warga = Warga::find($umkm->pemilik_warga_id);
+
         // Increment view count
         $umkm->increment('views');
 
-return view('pages.umkm.show', compact('umkm'));
+        return view('pages.umkm.show', compact('umkm', 'warga'));
     }
 
     /**
@@ -212,10 +218,7 @@ return view('pages.umkm.show', compact('umkm'));
             $query->orderBy('order')->orderBy('created_at');
         }]);
 
-        $users = \App\Models\User::where('role', 'mitra')
-                                ->orWhere('role', 'warga')
-                                ->orderBy('name')
-                                ->get();
+        $wargas = Warga::orderBy('name')->get();
 
         $kategories = config('umkm.kategori', [
             'Makanan & Minuman',
@@ -227,7 +230,7 @@ return view('pages.umkm.show', compact('umkm'));
             'Lainnya'
         ]);
 
-return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
+        return view('pages.umkm.edit', compact('umkm', 'wargas', 'kategories'));
     }
 
     /**
@@ -237,7 +240,7 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
     {
         $validated = $request->validate([
             'nama_usaha' => 'required|string|max:255',
-            'pemilik_warga_id' => 'required|integer|exists:users,id',
+            'pemilik_warga_id' => 'required|integer|exists:warga,warga_id',
             'alamat' => 'required|string|max:500',
             'rt' => 'required|string|max:3',
             'rw' => 'required|string|max:3',
@@ -246,7 +249,6 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
             'deskripsi' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'status' => 'nullable|in:aktif,nonaktif,pending',
             'files.*' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx',
             'captions' => 'nullable|array',
             'new_captions.*' => 'nullable|string|max:255',
@@ -335,7 +337,7 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
                         'caption' => $request->new_captions[$index] ?? null,
                         'extension' => $extension,
                         'order' => $currentMediaCount + $index,
-                        'is_featured' => false, // Default not featured
+                        'is_featured' => false,
                         'disk' => 'public',
                         'uploaded_by' => auth()->id(),
                     ]);
@@ -388,24 +390,11 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
     }
 
     /**
-     * Toggle UMKM status
-     */
-    public function toggleStatus(Umkm $umkm)
-    {
-        $umkm->update([
-            'status' => $umkm->status === 'aktif' ? 'nonaktif' : 'aktif'
-        ]);
-
-        return back()->with('success', 'Status UMKM berhasil diubah.');
-    }
-
-    /**
      * Get UMKM data for API/JSON
      */
     public function apiIndex(Request $request)
     {
-        $query = Umkm::with(['pemilik', 'media'])
-                    ->where('status', 'aktif');
+        $query = Umkm::with('media');
 
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
@@ -416,6 +405,15 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
         }
 
         $umkms = $query->orderBy('nama_usaha')->get();
+
+        // Ambil data warga untuk semua umkm
+        $wargaIds = $umkms->pluck('pemilik_warga_id')->unique()->toArray();
+        $wargas = Warga::whereIn('warga_id', $wargaIds)->get()->keyBy('warga_id');
+
+        // Tambahkan data warga ke setiap umkm
+        $umkms->each(function ($umkm) use ($wargas) {
+            $umkm->warga_data = $wargas[$umkm->pemilik_warga_id] ?? null;
+        });
 
         return response()->json([
             'success' => true,
@@ -429,11 +427,16 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
      */
     public function export(Request $request)
     {
-        $umkms = Umkm::with(['pemilik', 'media'])->get();
+        $umkms = Umkm::with('media')->get();
 
-        // You can implement Excel export here using Laravel Excel package
-        // For now, return JSON
+        // Ambil data warga untuk semua umkm sekaligus
+        $wargaIds = $umkms->pluck('pemilik_warga_id')->unique()->toArray();
+        $wargas = Warga::whereIn('warga_id', $wargaIds)->get()->keyBy('warga_id');
+
         if ($request->wantsJson()) {
+            $umkms->each(function ($umkm) use ($wargas) {
+                $umkm->warga_data = $wargas[$umkm->pemilik_warga_id] ?? null;
+            });
             return response()->json($umkms);
         }
 
@@ -444,27 +447,29 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ];
 
-        $callback = function() use ($umkms) {
+        $callback = function() use ($umkms, $wargas) {
             $file = fopen('php://output', 'w');
 
             // Header
             fputcsv($file, [
                 'ID', 'Nama Usaha', 'Pemilik', 'Alamat', 'RT', 'RW',
-                'Kategori', 'Kontak', 'Status', 'Dibuat'
+                'Kategori', 'Kontak', 'Deskripsi', 'Dibuat'
             ]);
 
             // Data
             foreach ($umkms as $umkm) {
+                $warga = $wargas[$umkm->pemilik_warga_id] ?? null;
+
                 fputcsv($file, [
                     $umkm->umkm_id,
                     $umkm->nama_usaha,
-                    $umkm->pemilik->name ?? '-',
+                    $warga->name ?? '-',
                     $umkm->alamat,
                     $umkm->rt,
                     $umkm->rw,
                     $umkm->kategori,
                     $umkm->kontak,
-                    $umkm->status,
+                    $umkm->deskripsi,
                     $umkm->created_at->format('d/m/Y H:i')
                 ]);
             }
@@ -480,13 +485,20 @@ return view('pages.umkm.edit', compact('umkm', 'users', 'kategories'));
      */
     public function map(Request $request)
     {
-        $umkms = Umkm::where('status', 'aktif')
-                    ->whereNotNull('latitude')
+        $umkms = Umkm::whereNotNull('latitude')
                     ->whereNotNull('longitude')
-                    ->with('pemilik')
                     ->get();
 
-return view('pages.umkm.map', compact('umkms'));
+        // Ambil data warga terkait
+        $wargaIds = $umkms->pluck('pemilik_warga_id')->unique()->toArray();
+        $wargas = Warga::whereIn('warga_id', $wargaIds)->get()->keyBy('warga_id');
+
+        // Tambahkan data warga ke setiap umkm
+        $umkms->each(function ($umkm) use ($wargas) {
+            $umkm->warga_data = $wargas[$umkm->pemilik_warga_id] ?? null;
+        });
+
+        return view('pages.umkm.map', compact('umkms'));
     }
 
     /**

@@ -132,7 +132,7 @@
                             <table class="table table-sm table-borderless table-hover">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th>#</th>
+                                        <th>No</th>
                                         <th>Produk</th>
                                         <th class="text-center">Jumlah</th>
                                         <th class="text-end">Subtotal</th>

@@ -12,64 +12,79 @@ class UmkmSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        echo "🚀 Memulai seeder UMKM...\n";
+        echo "🏪 Memulai seeder UMKM...\n";
 
-        // PERBAIKAN 1: Nonaktifkan foreign key check sebelum truncate
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('umkm')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        // Cek apakah ada data warga
-        $wargaIds = DB::table('warga')->pluck('warga_id')->toArray();
+        // Ambil ID warga 1-10 sebagai pemilik UMKM
+        $wargaIds = DB::table('warga')->whereBetween('warga_id', [1, 10])->pluck('warga_id')->toArray();
 
         if (empty($wargaIds)) {
             echo "⚠️  Tidak ada data warga. Jalankan WargaSeeder terlebih dahulu...\n";
             return;
         }
 
-        // Kategori UMKM
-        $kategoriUmkm = ['Kerajinan', 'Makanan', 'Minuman', 'Jasa', 'Pertanian', 'Teknologi', 'Fashion', 'Otomotif'];
+        // Data UMKM yang realistis dan konsisten
+        $umkmData = [
+            [
+                'nama_usaha' => 'Bouquet Bunga Makmur',
+                'pemilik_warga_id' => $wargaIds[0],
+                'alamat' => 'JL Inti Sari No. 15',
+                'rt' => '02',
+                'rw' => '03',
+                'kategori' => 'Kerajinan',
+                'kontak' => '081234567890',
+                'deskripsi' => 'Usaha bouquet bunga dengan berbagai macam variasi untuk semua acara, mulai dari pernikahan, wisuda, hingga ulang tahun.',
+            ],
+            [
+                'nama_usaha' => 'Toko Batik Sari Ayu',
+                'pemilik_warga_id' => $wargaIds[1],
+                'alamat' => 'JL Kenanga No. 8',
+                'rt' => '01',
+                'rw' => '02',
+                'kategori' => 'Fashion',
+                'kontak' => '081234567891',
+                'deskripsi' => 'Menjual berbagai macam batik tulis dan cap kualitas premium dengan motif tradisional dan modern.',
+            ],
+            [
+                'nama_usaha' => 'Kedai Kopi Nusantara',
+                'pemilik_warga_id' => $wargaIds[2],
+                'alamat' => 'JL Mawar No. 20',
+                'rt' => '03',
+                'rw' => '04',
+                'kategori' => 'Makanan & Minuman',
+                'kontak' => '081234567892',
+                'deskripsi' => 'Kedai kopi yang menyajikan berbagai jenis kopi lokal Indonesia dengan rasa autentik.',
+            ],
+            [
+                'nama_usaha' => 'Kerajinan Rotan Mandiri',
+                'pemilik_warga_id' => $wargaIds[3],
+                'alamat' => 'JL Melati No. 5',
+                'rt' => '02',
+                'rw' => '05',
+                'kategori' => 'Kerajinan',
+                'kontak' => '081234567893',
+                'deskripsi' => 'Memproduksi berbagai kerajinan dari rotan seperti kursi, meja, dan hiasan rumah.',
+            ],
+            [
+                'nama_usaha' => 'Sambal Ibu Rasa',
+                'pemilik_warga_id' => $wargaIds[4],
+                'alamat' => 'JL Anggrek No. 12',
+                'rt' => '04',
+                'rw' => '01',
+                'kategori' => 'Makanan & Minuman',
+                'kontak' => '081234567894',
+                'deskripsi' => 'Produksi sambal homemade dengan resep turun-temurun, menggunakan bahan-bahan segar dan alami.',
+            ],
+        ];
 
-        echo "📊 Membuat 30 UMKM dummy...\n";
-
-        // Data dummy 30 UMKM
-        for ($i = 1; $i <= 30; $i++) {
-            DB::table('umkm')->insert([
-                'nama_usaha'        => $faker->company() . ' ' . $faker->randomElement(['Store', 'Shop', 'Mart', 'Center', 'Hub']),
-                'pemilik_warga_id'  => $faker->randomElement($wargaIds),
-                'alamat'            => $faker->address(),
-                'rt'                => str_pad($faker->numberBetween(1, 10), 2, '0', STR_PAD_LEFT),
-                'rw'                => str_pad($faker->numberBetween(1, 10), 2, '0', STR_PAD_LEFT),
-                'kategori'          => $faker->randomElement($kategoriUmkm),
-                'kontak'            => '08' . $faker->numerify('##########'),
-                'deskripsi'         => $faker->paragraph(2),
-                'created_at'        => now(),
-                'updated_at'        => now(),
-            ]);
-
-            if ($i % 5 === 0) {
-                echo "✅ $i UMKM berhasil dibuat\n";
-            }
+        // Tambahkan timestamps
+        foreach ($umkmData as &$data) {
+            $data['created_at'] = now();
+            $data['updated_at'] = now();
         }
 
-        // Data real contoh
-        DB::table('umkm')->insert([
-            'nama_usaha'        => 'Bouquet Bunga Makmur',
-            'pemilik_warga_id'  => $wargaIds[0] ?? 1,
-            'alamat'            => 'JL Inti Sari No. 15, RT 2/RW 3',
-            'rt'                => '02',
-            'rw'                => '03',
-            'kategori'          => 'Kerajinan',
-            'kontak'            => '081234567890',
-            'deskripsi'         => 'Usaha bouquet bunga dengan berbagai macam variasi untuk semua acara, mulai dari pernikahan, wisuda, hingga ulang tahun.',
-            'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
+        DB::table('umkm')->insert($umkmData);
 
-        echo "🎉 Seeder UMKM selesai! Total 31 UMKM dibuat.\n";
-
-        // Debug: Tampilkan jumlah UMKM
-        $count = DB::table('umkm')->count();
-        echo "📈 Total data UMKM di database: $count\n";
+        echo "✅ 5 data UMKM berhasil dibuat\n";
+        echo "📊 Setiap UMKM dimiliki oleh warga yang berbeda (ID 1-5)\n\n";
     }
 }

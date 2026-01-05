@@ -53,13 +53,7 @@
                         <span class="badge bg-info">{{ $umkm->kategori ?? 'Makanan' }}</span>
                     </td>
                     <td>
-                        @if($umkm->status === 'active')
-                            <span class="badge bg-success">Aktif</span>
-                        @elseif($umkm->status === 'pending')
-                            <span class="badge bg-warning">Pending</span>
-                        @else
-                            <span class="badge bg-danger">Nonaktif</span>
-                        @endif
+
                     </td>
                     <td>{{ $umkm->created_at->format('d/m/Y') }}</td>
                     <td>

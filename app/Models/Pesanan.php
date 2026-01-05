@@ -56,16 +56,10 @@ class Pesanan extends Model
     }
 
     // Relasi ke produk melalui detail (jika diperlukan)
-    public function produk()
+
+        public function produk()
     {
-        return $this->hasManyThrough(
-            Produk::class,
-            DetailPesanan::class,
-            'pesanan_id', // Foreign key pada DetailPesanan
-            'produk_id',  // Foreign key pada Produk
-            'pesanan_id', // Local key pada Pesanan
-            'produk_id'   // Local key pada DetailPesanan
-        );
+        return $this->belongsTo(Produk::class, 'produk_id', 'produk_id');
     }
 
     // Method untuk generate nomor pesanan

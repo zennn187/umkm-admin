@@ -51,19 +51,26 @@ class DashboardController extends Controller
 
         case 'mitra':
             $stats = [
-                'total_umkm' => Umkm::where('user_id', $user->id)->count(),
-                'total_produk' => Produk::where('user_id', $user->id)->count(),
+                // PERBAIKAN: gunakan pemilik_warga_id bukan user_id
+                'total_umkm' => Umkm::where('pemilik_warga_id', $user->id)->count(),
+
+                // PERIKSA: tabel produk juga perlu diperiksa, apakah ada kolom user_id atau pemilik_warga_id?
+                'total_produk' => Produk::where('pemilik_warga_id', $user->id)->count(),
+
                 'pesanan_baru' => Pesanan::whereHas('umkm', function($query) use ($user) {
-                        $query->where('user_id', $user->id);
+                        $query->where('pemilik_warga_id', $user->id);
                     })->where('status', 'Baru')->count(),
+
                 'total_pesanan' => Pesanan::whereHas('umkm', function($query) use ($user) {
-                        $query->where('user_id', $user->id);
+                        $query->where('pemilik_warga_id', $user->id);
                     })->count(),
+
                 'pesanan_selesai' => Pesanan::whereHas('umkm', function($query) use ($user) {
-                        $query->where('user_id', $user->id);
+                        $query->where('pemilik_warga_id', $user->id);
                     })->where('status', 'Selesai')->count(),
+
                 'penjualan_bulan_ini' => Pesanan::whereHas('umkm', function($query) use ($user) {
-                        $query->where('user_id', $user->id);
+                        $query->where('pemilik_warga_id', $user->id);
                     })->whereMonth('created_at', now()->month)
                       ->whereYear('created_at', now()->year)
                       ->where('status', 'Selesai')
@@ -73,7 +80,6 @@ class DashboardController extends Controller
             break;
 
         default: // user
-            // PERBAIKAN: User biasa lihat pesanan berdasarkan warga_id
             $stats = [
                 'pesanan_aktif' => Pesanan::where('warga_id', $user->id)
                     ->whereIn('status', ['Baru', 'Diproses', 'Dikirim'])
@@ -106,43 +112,48 @@ class DashboardController extends Controller
      * Show UMKM management page
      */
     public function umkmManagement()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        if ($user->role === 'super_admin' || $user->role === 'admin') {
-            // Admin bisa lihat semua UMKM
-            $umkms = Umkm::with('user')->latest()->paginate(10);
-        } elseif ($user->role === 'mitra') {
-            // Mitra hanya bisa lihat UMKM miliknya
-            $umkms = Umkm::where('user_id', $user->id)->latest()->paginate(10);
-        } else {
-            // User biasa tidak punya UMKM
-            $umkms = collect();
-        }
-
-        return view('pages.dashboard.umkm', compact('umkms'));
+    if ($user->role === 'super_admin' || $user->role === 'admin') {
+        $umkms = Umkm::with('user')->latest()->paginate(10);
+    } elseif ($user->role === 'mitra') {
+        // PERBAIKAN: gunakan pemilik_warga_id
+        $umkms = Umkm::where('pemilik_warga_id', $user->id)->latest()->paginate(10);
+    } else {
+        $umkms = collect();
     }
+
+    return view('pages.dashboard.umkm', compact('umkms'));
+}
 
     /**
      * Show produk management page
      */
     public function produkManagement()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        if ($user->role === 'super_admin' || $user->role === 'admin') {
-            // Admin bisa lihat semua produk
-            $produks = Produk::with(['umkm', 'user'])->latest()->paginate(10);
-        } elseif ($user->role === 'mitra') {
-            // Mitra hanya bisa lihat produk miliknya
-            $produks = Produk::where('user_id', $user->id)->latest()->paginate(10);
-        } else {
-            // User biasa
-            $produks = Produk::where('status', 'active')->latest()->paginate(10);
-        }
-
-        return view('pages.dashboard.produk', compact('produks'));
+    if ($user->role === 'super_admin' || $user->role === 'admin') {
+        // Admin bisa lihat semua produk
+        $produks = Produk::with(['umkm', 'umkm.user'])->latest()->paginate(10);
+    } elseif ($user->role === 'mitra') {
+        // Mitra hanya bisa lihat produk dari UMKM miliknya
+        $umkmIds = Umkm::where('pemilik_warga_id', $user->id)->pluck('umkm_id');
+        $produks = Produk::whereIn('umkm_id', $umkmIds)
+            ->with('umkm')
+            ->latest()
+            ->paginate(10);
+    } else {
+        // User biasa hanya lihat produk aktif
+        $produks = Produk::where('status', 'Aktif')
+            ->with('umkm')
+            ->latest()
+            ->paginate(10);
     }
+
+    return view('pages.dashboard.produk', compact('produks'));
+}
 
     /**
      * Show pesanan management page

@@ -14,8 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Hanya Super Admin yang bisa akses
-        if (auth()->user()->role !== 'super_admin') {
+        // Hanya Super Admin dan Admin yang bisa akses
+        if (auth()->user()->role !== 'super_admin' && auth()->user()->role !== 'admin') {
             abort(403, 'Anda tidak memiliki akses.');
         }
 
