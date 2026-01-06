@@ -229,7 +229,7 @@
                         </a>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <a href="{{ route('laporan') }}" class="btn btn-info w-100">
+                        <a href="{{ route('laporan.penjualan') }}" class="btn btn-info w-100">
                             <i class="fas fa-chart-line me-2"></i>Laporan
                         </a>
                     </div>
